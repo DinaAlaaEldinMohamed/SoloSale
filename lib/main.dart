@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 
 ///
 ///
-/// Flutter POS is a flutter Point of Sale Application
+/// SoloSale is a flutter Point of Sale Application
 ///
 ///
 void main() async {

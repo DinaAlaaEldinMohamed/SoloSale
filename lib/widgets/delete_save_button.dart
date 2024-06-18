@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/utils/const.dart';
-import 'package:flutter_pos/widgets/custom_elevated_button.dart';
+import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 
 class DeleteSaveButton extends StatelessWidget {
   const DeleteSaveButton({

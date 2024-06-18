@@ -4,7 +4,7 @@ import 'package:flutter_pos/models/order_item.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
-import 'package:flutter_pos/widgets/custom_elevated_button.dart';
+import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/search_filter_icon.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -34,7 +34,6 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
 
   void initPage() async {
     products = await _productController.getProductList(setState);
-    // Now we're sure that showSearchBar is assigned before being used
     showSearchBar = products?.isNotEmpty ?? false;
     setState(() {});
   }
@@ -159,8 +158,14 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
                                       icon: const Icon(Icons.add)),
                                 ],
                               )
-                            : SizedBox(),
-                        leading: Image.network(product.image ?? ''),
+                            : const SizedBox(),
+                        leading: Image.network(
+                          product.image ?? '',
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            return Image.asset('assets/images/product.png');
+                          },
+                        ),
                         title: Text(product.productName ?? 'No name'),
                         trailing: IconButton(
                             onPressed: () {
@@ -191,67 +196,6 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
     });
   }
 
-  Future<void> onSetOrder() async {
-    try {
-      if (selectedOrderItems == null ||
-          (selectedOrderItems?.isEmpty ?? false)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
-            content: Text(
-              'You Must Add Order Items First',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-        return;
-      }
-
-      var sqlHelper = GetIt.I.get<SqlHelper>();
-
-      var orderId = await sqlHelper.db!
-          .insert('orders', conflictAlgorithm: ConflictAlgorithm.replace, {
-        'label': orderLabel,
-        'totalPrice': calculateTotalPrice,
-        'discount': 0,
-        'clientId': 1
-      });
-
-      var batch = sqlHelper.db!.batch();
-      for (var orderItem in selectedOrderItems!) {
-        batch.insert('orderProductItems', {
-          'orderId': orderId,
-          'productId': orderItem.productId,
-          'productCount': orderItem.productCount,
-        });
-      }
-      var result = await batch.commit();
-
-      print('>>>>>>>> orderProductItems${result}');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content: Text(
-            'Order Created Successfully',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-      Navigator.pop(context, true);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(
-            'Error : $e',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-    }
-  }
-
   OrderItem? getOrderItem(int productId) {
     for (var orderItem in selectedOrderItems ?? []) {
       if (orderItem.productId == productId) {
@@ -259,15 +203,6 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
       }
     }
     return null;
-  }
-
-  double? get calculateTotalPrice {
-    var totalPrice = 0.0;
-    for (var orderItem in selectedOrderItems ?? []) {
-      totalPrice = totalPrice +
-          (orderItem?.productCount ?? 0) * (orderItem?.product?.price ?? 0);
-    }
-    return totalPrice;
   }
 
   void onRemoveOrderItem(int productId) {
@@ -289,15 +224,6 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
   }
 }
 
-class MyWidget extends StatelessWidget {
-  const MyWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
-
 Widget orderItemColumn() {
   return Column(children: [
     const Text('Order Items',
@@ -313,7 +239,13 @@ Widget orderItemColumn() {
           dense: true, // Reduces the size of the ListTile
           visualDensity: const VisualDensity(
               horizontal: 0, vertical: -4), // Minimizes vertical padding
-          leading: Image.network(orderItem.product.image ?? ''),
+          leading: Image.network(
+            orderItem.product.image ?? '',
+            errorBuilder: (BuildContext context, Object exception,
+                StackTrace? stackTrace) {
+              return Image.asset('assets/images/product.png');
+            },
+          ),
           title: Text(
             '${orderItem.product.productName ?? 'No name'}',
             style: bodyText(Colors.black),
@@ -341,4 +273,13 @@ Widget orderItemColumn() {
         ),
       ),
   ]);
+}
+
+double? get calculateTotalPrice {
+  var totalPrice = 0.0;
+  for (var orderItem in selectedOrderItems ?? []) {
+    totalPrice = totalPrice +
+        (orderItem?.productCount ?? 0) * (orderItem?.product?.price ?? 0);
+  }
+  return totalPrice;
 }

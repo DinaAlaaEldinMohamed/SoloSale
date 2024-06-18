@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/controllers/clients/clients_controller.dart';
 import 'package:flutter_pos/models/client.dart';
 import 'package:flutter_pos/utils/const.dart';
-import 'package:flutter_pos/widgets/custom_elevated_button.dart';
+import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/custom_text_field.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';

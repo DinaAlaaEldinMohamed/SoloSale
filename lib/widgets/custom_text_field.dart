@@ -8,17 +8,19 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final Color fieldborderColor;
   const CustomTextField(
       {this.labelText,
       this.controller,
       this.validator,
       super.key,
       this.inputFormatters,
-      this.keyboardType});
+      this.keyboardType,
+      this.fieldborderColor = borderColor});
 
   InputBorder get textFieldBorder => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
-      borderSide: const BorderSide(color: borderColor));
+      borderSide: BorderSide(color: fieldborderColor));
 
   @override
   Widget build(BuildContext context) {

@@ -12,6 +12,7 @@ const Color warningColor = Color(0xFFFF7A00);
 const Color lightGrayColor = Color(0xFF666666);
 const Color veryLightGrayColor = Color.fromARGB(255, 220, 217, 217);
 const Color secondaryButtonColor = Color.fromARGB(255, 219, 226, 244);
+const Color greenColor = Colors.green;
 
 const Color mediumGrayColor = Color(0xFF444444);
 const textGrayColor = Color(0xFFAAAAAA);

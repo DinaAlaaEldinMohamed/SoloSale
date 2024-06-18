@@ -6,8 +6,9 @@ import 'package:flutter_pos/controllers/product/product_controller.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/image_utils.dart';
+import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/category_drop_down.dart';
-import 'package:flutter_pos/widgets/custom_elevated_button.dart';
+
 import 'package:flutter_pos/widgets/custom_text_field.dart';
 import 'package:get/get.dart';
 

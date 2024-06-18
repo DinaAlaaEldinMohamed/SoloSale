@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/category.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
-import 'package:flutter_pos/widgets/custom_elevated_button.dart';
+import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/custom_text_field.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sqflite/sqflite.dart';
