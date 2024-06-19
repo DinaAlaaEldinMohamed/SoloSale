@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_pos/models/currency.dart';
+import 'package:flutter_pos/models/exchange_rate.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class SqlHelper {
   var path = 'pos_db6.db';
+  List<Currency>? currencies;
   Database? db;
   Future<void>? registerForeignKeys() async {
     await db!.execute("""PRAGMA foreign_keys = ON""");
@@ -47,6 +50,7 @@ class SqlHelper {
       Create table If not exists orders(
       id integer primary key,
       totalPrice real,
+      paidCurrency text,
       label text,
       discount real,
       clientId integer ,
@@ -60,6 +64,18 @@ class SqlHelper {
       productId Integer,
       foreign key(productId) references products(productId)
       ON Delete restrict
+      )""");
+      batch.execute("""
+      Create table If not exists currencies(
+        code TEXT PRIMARY KEY,
+        name TEXT,
+        symbol TEXT
+      )""");
+      batch.execute("""
+      Create table If not exists exchangeRates(
+      baseCurrency TEXT,
+      targetCurrency TEXT,
+      rate REAL
       )""");
 
       var result = await batch.commit();
@@ -92,5 +108,93 @@ class SqlHelper {
       print(
           '=====================Attention there is an error on creating DB ::==========>> $e');
     }
+  }
+
+  Future<void> seedDatabase() async {
+    try {
+      // Insert currencies
+
+      final usd = Currency.fromJson(
+          {'code': "USD", 'name': "US Dollar", 'symbol': "\$"});
+      final egp = Currency.fromJson(
+          {'code': 'EGP', 'name': 'Egyptian Pound', 'symbol': '£'});
+      final eur =
+          Currency.fromJson({'code': 'EUR', 'name': 'Euro', 'symbol': '€'});
+
+      await db!.insert('currencies', usd.toJson());
+      await db!.insert('currencies', egp.toJson());
+      await db!.insert('currencies', eur.toJson());
+
+      // Insert exchange rates
+      final usdToEgp =
+          ExchangeRate(baseCurrency: 'EGP', targetCurrency: 'USD', rate: 47.65);
+      final eurToEgp =
+          ExchangeRate(baseCurrency: 'EGP', targetCurrency: 'EUR', rate: 51.42);
+      await db!.insert('exchangeRates', usdToEgp.toJson());
+      await db!.insert('exchangeRates', eurToEgp.toJson());
+
+      print('Seed inserted successfully!');
+    } catch (e) {
+      print('Error on seed currency and exchange rate : $e');
+    }
+  }
+
+  void getCurrencies(Function setStateCallBack) async {
+    try {
+      //clients = [];
+      var data = await db!.query('currencies');
+
+      if (data.isNotEmpty) {
+        currencies = [];
+        for (var item in data) {
+          currencies?.add(Currency.fromJson(item));
+          print(item);
+        }
+      } else {
+        currencies = [];
+      }
+    } catch (e) {
+      currencies = [];
+      print('Error in get  $e');
+    }
+    setStateCallBack(() {});
+  }
+
+  Future<double> exchangeRate(
+      {String targetCurrency = 'USD', String baseCurrency = 'EGP'}) async {
+    try {
+      var rate = await db?.rawQuery(
+          """SELECT rate FROM exchangeRates WHERE targetCurrency='$targetCurrency' AND baseCurrency='$baseCurrency'""");
+      if (rate != null && rate.isNotEmpty) {
+        return rate.first['rate'] as double;
+      }
+      if (baseCurrency == targetCurrency) {
+        return 1;
+      }
+    } catch (e) {
+      print(
+          "Attention !!! an error happened when tring to got exchange rate =>error :$e");
+    }
+    return 0.0;
+  }
+
+  Future<String> getOrderPaidCurrency() async {
+    try {
+      await db?.delete('orders', where: 'paidCurrency IS NULL');
+      var paidCurrency = await db?.rawQuery("""SELECT paidCurrency
+      FROM orders
+      GROUP BY paidCurrency
+      ORDER BY COUNT(*) DESC
+      LIMIT 1""");
+      print(
+          'paidCurrency===========================================================================$paidCurrency');
+      if (paidCurrency != null && paidCurrency.isNotEmpty) {
+        return paidCurrency.first['paidCurrency'] as String;
+      }
+    } catch (e) {
+      print(
+          "Attention !!! an error happened when tring to got Order paidCurrency =>error :$e");
+    }
+    return '';
   }
 }

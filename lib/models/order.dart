@@ -6,6 +6,7 @@ class Order {
   int? clientId;
   String? clientName;
   String? clientphone;
+  String? paidCurrency;
   String? comment;
 
   Order();
@@ -18,6 +19,7 @@ class Order {
     clientId = json['clientId'];
     clientName = json['clientName'];
     clientphone = json['clientphone'];
+    paidCurrency = json['paidCurrency'];
   }
 
   Map<String, dynamic> toJson() {
@@ -28,6 +30,7 @@ class Order {
       'discount': discount,
       'clientId': clientId,
       'clientName': clientName,
+      'paidCurrency': paidCurrency
     };
   }
 
@@ -38,6 +41,7 @@ class Order {
       'totalPrice': totalPrice,
       'discount': discount,
       'clientId': clientId,
+      'paidCurrency': paidCurrency
     };
   }
 }

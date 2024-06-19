@@ -207,7 +207,8 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
   }
 }
 
-Widget orderItemColumn() {
+Widget orderItemColumn(
+    {String? selectedCurrency = 'EGP', double exchangeRate = 1}) {
   return Column(children: [
     const Text('Order Items',
         style: TextStyle(
@@ -234,7 +235,7 @@ Widget orderItemColumn() {
             style: bodyText(Colors.black),
           ),
           subtitle: Text(
-            '${orderItem.productCount * orderItem.product.price} egp \n 40 usd',
+            '${(orderItem.productCount * orderItem.product.price).toStringAsFixed(2)} EGP\n${(orderItem.productCount * orderItem.product.price / exchangeRate).toStringAsFixed(2)} $selectedCurrency',
             style: bodyText(lightGrayColor),
           ),
           trailing: Container(

@@ -1,23 +1,27 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos/controllers/sales/sales_controller.dart';
 import 'package:flutter_pos/models/client.dart';
+import 'package:flutter_pos/models/currency.dart';
 import 'package:flutter_pos/models/order.dart';
 import 'package:flutter_pos/utils/const.dart';
+import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/buttons/custom_text_button.dart';
 import 'package:flutter_pos/widgets/clients_dropdown.dart';
+import 'package:flutter_pos/widgets/currency_dropDown.dart';
 import 'package:flutter_pos/widgets/custom_text_field.dart';
 import 'package:flutter_pos/widgets/dashed_line.dart';
 import 'package:flutter_pos/widgets/order_item_dialog.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 
 class SalesCrudScreen extends StatefulWidget {
   final Client? client;
   final Order? order;
-  const SalesCrudScreen({this.client, this.order, super.key});
+  final Currency? currency;
+
+  const SalesCrudScreen({this.client, this.order, this.currency, super.key});
 
   @override
   State<SalesCrudScreen> createState() => _SalesCrudScreenState();
@@ -27,23 +31,29 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
   final SalesController _salesController = Get.put(SalesController());
 
   int? selectedClientId;
+  String? selectedCurrencyCode = 'EGP';
   TextEditingController? discountController;
   TextEditingController? commentController;
   bool showDiscountField = false;
   String? orderLabel;
   double totalPriceAfterDiscount = 0.0;
   double discountAmount = 0.0;
+  double exchangeRate = 0.0;
+  String exchangeRateText = '';
   @override
   void initState() {
     discountController =
         TextEditingController(text: '${widget.order?.discount ?? ''}');
     commentController =
-        TextEditingController(text: '${widget.order?.comment ?? ''}');
+        TextEditingController(text: widget.order?.comment ?? '');
     discountController?.addListener(_updateDiscountDisplay);
     selectedClientId = widget.order?.clientId;
+    selectedCurrencyCode = widget.currency?.code;
+
     orderLabel = widget.order == null
         ? '#OR${DateTime.now().millisecondsSinceEpoch}'
         : widget.order?.label;
+    _displayExChangeRate();
     super.initState();
   }
 
@@ -52,6 +62,16 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
     discountAmount = calculateTotalPrice! * (discount / 100);
     discountAmount = double.parse(discountAmount.toStringAsFixed(2));
     totalPriceAfterDiscount = calculateTotalPrice! - discountAmount;
+
+    setState(() {});
+  }
+
+  void _displayExChangeRate() async {
+    exchangeRate = await GetIt.I
+        .get<SqlHelper>()
+        .exchangeRate(targetCurrency: selectedCurrencyCode ?? 'EGP');
+
+    exchangeRateText = '1 ${selectedCurrencyCode ?? 'EGP'} = $exchangeRate EGP';
 
     setState(() {});
   }
@@ -76,6 +96,16 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
             color: primaryUltraLightColor,
           ),
         ),
+        actions: [
+          CurrencyDropDown(
+            selectedValue: selectedCurrencyCode,
+            onChanged: (value) {
+              selectedCurrencyCode = value;
+              _displayExChangeRate();
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(children: [
@@ -90,7 +120,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                     top: 5,
                   ),
                   child: Text(
-                    '$orderLabel',
+                    '${exchangeRateText ?? ''}',
                     style: bodyText(warningColor),
                   ),
                 ),
@@ -121,7 +151,9 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
             ),
             child: Column(
               children: [
-                orderItemColumn(),
+                orderItemColumn(
+                    selectedCurrency: selectedCurrencyCode,
+                    exchangeRate: exchangeRate),
                 CustomTextButton(
                   buttonLabel: 'Add Product',
                   onPressed: () {
@@ -144,7 +176,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                       style: bodyText(blackColor),
                     ),
                     Text(
-                      '$calculateTotalPrice USD',
+                      '$calculateTotalPrice ${selectedCurrencyCode ?? 'EGP'} ',
                       style: h6(blackColor),
                     ),
                   ],
@@ -189,7 +221,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                                 style: bodyText(blackColor),
                               ),
                               Text(
-                                '${discountAmount ?? '0'} EGP',
+                                '${discountAmount ?? '0'} $selectedCurrencyCode',
                                 style: h6(blackColor),
                               ),
                             ],
@@ -220,7 +252,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                       Row(
                         children: [
                           Text(
-                            'Paid : ${totalPriceAfterDiscount ?? '0'} EGP',
+                            'Paid : ${(totalPriceAfterDiscount / exchangeRate).toStringAsFixed(2)} ${selectedCurrencyCode ?? 'EGP'} ',
                             style: bodyText(primaryColor),
                           ),
                         ],
@@ -228,7 +260,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                       Row(
                         children: [
                           Text(
-                            'Remaining : 0 EGP',
+                            'Remaining : 0 ${selectedCurrencyCode ?? 'EGP'} ',
                             style: bodyText(mediumGrayColor),
                           ),
                         ],
@@ -303,7 +335,8 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         'label': orderLabel,
         'totalPrice': calculateTotalPrice,
         'discount': discountAmount,
-        'clientId': selectedClientId
+        'clientId': selectedClientId,
+        'paidCurrency': selectedCurrencyCode ?? 'EGP'
       });
       if (widget.order == null) {
         // add product logic

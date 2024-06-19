@@ -15,6 +15,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   bool tablesCreated = false;
+  double exchangeRate = 0.0;
+  String exchangeRateText = '';
+  String selectedCurrencyCode = 'USD';
+  //SalesController _salesController = Get.find();
   @override
   void initState() {
     init();
@@ -22,8 +26,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void init() async {
-    tablesCreated = await GetIt.I.get<SqlHelper>().createTables();
+    var sqlIns = GetIt.I.get<SqlHelper>();
+    selectedCurrencyCode = await sqlIns.getOrderPaidCurrency();
+    print(
+        'selectedCurrencyCode order================================================================================================ $selectedCurrencyCode');
+    tablesCreated = await sqlIns.createTables();
+    await sqlIns.seedDatabase();
+    exchangeRate =
+        await sqlIns.exchangeRate(targetCurrency: selectedCurrencyCode);
 
+    exchangeRateText = '1 $selectedCurrencyCode = $exchangeRate EGP';
     isLoading = false;
     setState(() {});
   }
@@ -78,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 25),
                   InfoHeader(
                     title: 'Exchange Rate',
-                    trailing: '1 USD = 47.45 EGP',
+                    trailing: exchangeRateText,
                     onTap: () {},
                   ),
                   const SizedBox(height: 16),

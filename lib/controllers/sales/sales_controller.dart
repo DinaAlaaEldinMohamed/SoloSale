@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 
 class SalesController extends GetxController {
   List<Order>? orders;
+
   var sqlHelper = GetIt.I.get<SqlHelper>();
   Future<void> addOrder(
       Order order, List<OrderItem>? selectedOrderItems) async {
