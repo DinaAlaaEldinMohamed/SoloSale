@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:get/get.dart';

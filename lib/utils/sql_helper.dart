@@ -47,9 +47,10 @@ class SqlHelper {
       Create table If not exists orders(
       id integer primary key,
       totalPrice real,
+      label text,
       discount real,
       clientId integer ,
-      foreign key(clientId) references clients(id)
+      foreign key(clientId) references clients(clientId)
       ON Delete restrict
       )""");
       batch.execute("""
@@ -57,7 +58,7 @@ class SqlHelper {
       orderId Integer,
       productCount Integer,
       productId Integer,
-      foreign key(productId) references products(id)
+      foreign key(productId) references products(productId)
       ON Delete restrict
       )""");
 

@@ -23,6 +23,10 @@ class ProductTile extends StatelessWidget {
             padding: const EdgeInsets.all(1),
             child: Image.network(
               product?.image ?? '',
+              errorBuilder: (BuildContext context, Object exception,
+                  StackTrace? stackTrace) {
+                return Image.asset('assets/images/product.png');
+              },
               fit: BoxFit.contain,
             ),
           ),

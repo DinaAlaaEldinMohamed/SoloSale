@@ -3,12 +3,9 @@ import 'package:flutter_pos/controllers/product/product_controller.dart';
 import 'package:flutter_pos/models/order_item.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/const.dart';
-import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter_pos/widgets/search_filter_icon.dart';
 import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
-import 'package:sqflite/sqflite.dart';
 
 List<OrderItem>? selectedOrderItems;
 
@@ -96,21 +93,7 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
                         //Sort Icon
                         SearchFilterIcon(
                           icon: Icons.sort,
-                          onPressed: () {
-                            // showModalBottomSheet(
-                            //   isScrollControlled: true,
-                            //   context: context,
-                            //   shape: const RoundedRectangleBorder(
-                            //     borderRadius: BorderRadius.only(
-                            //       topLeft: Radius.circular(4),
-                            //       topRight: Radius.circular(4),
-                            //     ),
-                            //   ),
-                            //   builder: (_) {
-                            //     return const SortProductsBottomSheet();
-                            //   },
-                            //);
-                          },
+                          onPressed: () {},
                         ),
                       ]),
                     )

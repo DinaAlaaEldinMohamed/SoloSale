@@ -6,6 +6,7 @@ class Order {
   int? clientId;
   String? clientName;
   String? clientphone;
+  String? comment;
 
   Order();
 
@@ -27,6 +28,16 @@ class Order {
       'discount': discount,
       'clientId': clientId,
       'clientName': clientName,
+    };
+  }
+
+  Map<String, dynamic> toJsonAddOrder() {
+    return {
+      'id': id,
+      'label': label,
+      'totalPrice': totalPrice,
+      'discount': discount,
+      'clientId': clientId,
     };
   }
 }

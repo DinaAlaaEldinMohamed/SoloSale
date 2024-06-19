@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final Color fieldborderColor;
+  final Color placeHolderTextColor;
   const CustomTextField(
       {this.labelText,
       this.controller,
@@ -16,7 +17,8 @@ class CustomTextField extends StatelessWidget {
       super.key,
       this.inputFormatters,
       this.keyboardType,
-      this.fieldborderColor = borderColor});
+      this.fieldborderColor = borderColor,
+      this.placeHolderTextColor = textPlaceholderColor});
 
   InputBorder get textFieldBorder => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
@@ -49,7 +51,7 @@ class CustomTextField extends StatelessWidget {
             ),
           ),
           labelText: labelText,
-          labelStyle: bodyText(textPlaceholderColor),
+          labelStyle: bodyText(placeHolderTextColor),
         )
         //  hintStyle: bodyText(textPlaceholderColor)),
         );
