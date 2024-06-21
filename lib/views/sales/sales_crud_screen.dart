@@ -4,6 +4,7 @@ import 'package:flutter_pos/controllers/sales/sales_controller.dart';
 import 'package:flutter_pos/models/client.dart';
 import 'package:flutter_pos/models/currency.dart';
 import 'package:flutter_pos/models/order.dart';
+import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:flutter_pos/widgets/buttons/custom_elevated_button.dart';
@@ -29,7 +30,7 @@ class SalesCrudScreen extends StatefulWidget {
 
 class _SalesCrudScreenState extends State<SalesCrudScreen> {
   final SalesController _salesController = Get.put(SalesController());
-
+  String formattedDate = '';
   int? selectedClientId;
   String? selectedCurrencyCode = 'EGP';
   TextEditingController? discountController;
@@ -42,10 +43,11 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
   String exchangeRateText = '';
   @override
   void initState() {
+    formattedDate = currentDateTime.toIso8601String();
     discountController =
         TextEditingController(text: '${widget.order?.discount ?? ''}');
     commentController =
-        TextEditingController(text: widget.order?.comment ?? '');
+        TextEditingController(text: widget.order?.orderComment ?? '');
     discountController?.addListener(_updateDiscountDisplay);
     selectedClientId = widget.order?.clientId;
     selectedCurrencyCode = widget.currency?.code;
@@ -336,7 +338,9 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         'totalPrice': calculateTotalPrice,
         'discount': discountAmount,
         'clientId': selectedClientId,
-        'paidCurrency': selectedCurrencyCode ?? 'EGP'
+        'paidCurrency': selectedCurrencyCode ?? 'EGP',
+        'orderComment': commentController?.text ?? 'no comment',
+        'orderDate': formattedDate
       });
       if (widget.order == null) {
         // add product logic

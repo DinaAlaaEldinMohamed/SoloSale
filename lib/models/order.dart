@@ -7,8 +7,8 @@ class Order {
   String? clientName;
   String? clientphone;
   String? paidCurrency;
-  String? comment;
-
+  String? orderComment;
+  String? orderDate;
   Order();
 
   Order.fromJson(Map<String, dynamic> json) {
@@ -20,6 +20,8 @@ class Order {
     clientName = json['clientName'];
     clientphone = json['clientphone'];
     paidCurrency = json['paidCurrency'];
+    orderComment = json['orderComment'];
+    orderDate = json['orderDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -30,7 +32,9 @@ class Order {
       'discount': discount,
       'clientId': clientId,
       'clientName': clientName,
-      'paidCurrency': paidCurrency
+      'paidCurrency': paidCurrency,
+      'orderComment': orderComment,
+      'orderDate': orderDate,
     };
   }
 
@@ -41,7 +45,9 @@ class Order {
       'totalPrice': totalPrice,
       'discount': discount,
       'clientId': clientId,
-      'paidCurrency': paidCurrency
+      'paidCurrency': paidCurrency,
+      'orderComment': orderComment,
+      'orderDate': orderDate,
     };
   }
 }

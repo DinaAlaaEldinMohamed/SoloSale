@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_pos/models/currency.dart';
 import 'package:flutter_pos/models/exchange_rate.dart';
+import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
@@ -53,6 +54,8 @@ class SqlHelper {
       paidCurrency text,
       label text,
       discount real,
+      orderComment text,
+      orderDate text,
       clientId integer ,
       foreign key(clientId) references clients(clientId)
       ON Delete restrict
@@ -196,5 +199,58 @@ class SqlHelper {
           "Attention !!! an error happened when tring to got Order paidCurrency =>error :$e");
     }
     return '';
+  }
+
+  Future<double> getTodayTotalSales({String paidCurrency = 'EGP'}) async {
+    try {
+      final formattedDate = formatDate(currentDateTime);
+      // Query to calculate total sales for today
+      final result = await db?.rawQuery('''
+      SELECT SUM(totalPrice) AS todayTotalSales
+      FROM orders
+      WHERE orderDate LIKE '$formattedDate%'
+      and paidCurrency ='$paidCurrency'
+    ''');
+
+      if (result != null && result.isNotEmpty) {
+        final totalSales = result.first['todayTotalSales'] as double;
+        return totalSales;
+      } else {
+        return 0.0;
+      }
+    } catch (e) {
+      print("Error occurred while fetching today's total sales: $e");
+      return 0.0;
+    }
+  }
+
+  Future<Map<String, double>> getTodayTotalSalesWithCurrency() async {
+    try {
+      // Get the current date in 'YYYY-MM-DD' format
+      final currentDateTime = DateTime.now();
+      final formattedDate =
+          '${currentDateTime.year}-${currentDateTime.month.toString().padLeft(2, '0')}-${currentDateTime.day.toString().padLeft(2, '0')}';
+
+      // Query to calculate total sales for the current date
+      final result = await db?.rawQuery('''
+      SELECT paidCurrency,SUM(totalPrice) AS todayTotalSales
+      FROM orders
+      WHERE orderDate LIKE '$formattedDate%'
+    ''');
+      final todaySalesMap = <String, double>{};
+      if (result != null) {
+        for (final row in result) {
+          final currency = row['paidCurrency'] as String;
+          final totalSales = row['total_sales'] as double;
+          todaySalesMap[currency] = totalSales;
+        }
+      }
+
+      return todaySalesMap;
+    } catch (e) {
+      print(
+          "Attention !!! an error happened when tring to got Order  Today Total Sales with its currency =>error :$e");
+      return {};
+    }
   }
 }

@@ -4,7 +4,8 @@ import 'package:flutter_pos/utils/const.dart';
 import 'package:get/get.dart';
 
 class SalesDateFilter extends StatefulWidget {
-  const SalesDateFilter({super.key});
+  void Function()? onTap;
+  SalesDateFilter({this.onTap, super.key});
 
   @override
   State<SalesDateFilter> createState() => _SalesDateFilterState();
@@ -16,18 +17,7 @@ class _SalesDateFilterState extends State<SalesDateFilter> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        final picked = await showDateRangePicker(
-          context: context,
-          firstDate: DateTime(2000),
-          lastDate: DateTime.now(),
-        );
-        if (picked != null) {
-          setState(() {
-            _salesController.setSelectedDateRange(picked);
-          });
-        }
-      },
+      onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(

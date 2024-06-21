@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/order.dart';
 import 'package:flutter_pos/models/order_item.dart';
+import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 
 class SalesController extends GetxController {
   List<Order>? orders;
+  List<Order>? clientOrders;
+  List<Order>? filteredOrders;
+
   DateTimeRange? selectedDateRange;
 
   var sqlHelper = GetIt.I.get<SqlHelper>();
@@ -26,10 +30,11 @@ class SalesController extends GetxController {
     print('>>>>>>>> orderProductItems${result}');
   }
 
-  void getOrders(Function setStateCallBack) async {
+//=========================get all orders ================
+  Future<void> getOrders(Function setStateCallBack) async {
     try {
       var result = await sqlHelper.db!.rawQuery("""
-  Select O.*,C.*,OPI.* from orders O
+  Select O.*,C.*,OPI.* , DATE(O.orderDate) as formated_date from orders O
   Inner JOIN clients C
   On O.clientId = C.clientId
    Inner JOIN orderProductItems OPI
@@ -52,12 +57,105 @@ class SalesController extends GetxController {
     setStateCallBack(() {});
   }
 
-  void setSelectedDateRange(DateTimeRange dateRange) {
-    selectedDateRange = dateRange;
-    //  filterSales();
+//=========================get client orders=====================
+  void getClientOrders(Function setStateCallBack, int clientId) async {
+    try {
+      var result = await sqlHelper.db!.rawQuery("""
+  Select O.*,C.*,OPI.* from orders O
+  Inner JOIN clients C
+  On O.clientId = '$clientId'
+   Inner JOIN orderProductItems OPI
+  On OPI.orderId = O.id
+  """);
+      print("clients  orders==============================>>>>>>>>$result");
+      if (result.isNotEmpty) {
+        clientOrders = [];
+        for (var item in result) {
+          clientOrders?.add(Order.fromJson(item));
+        }
+      } else {
+        clientOrders = [];
+      }
+    } catch (e) {
+      clientOrders = [];
+      print('Error in get clientOrders $e');
+    }
   }
 
-  void clearSelectedDateRange() {
-    selectedDateRange = null;
+  //=========================filter sales =====================
+  Future<void> filterSales(
+    Function setStateCallBack, {
+    DateTime? startDate,
+    DateTime? endDate,
+    int? clientId,
+    String? salesType,
+  }) async {
+    double? minTotalPrice;
+    double? maxTotalPrice;
+    if (salesType != null) {
+      if (salesType == 'high') {
+        maxTotalPrice = 100000;
+      } else if (salesType == 'low') {
+        minTotalPrice = 10;
+      }
+
+      try {
+        final queryBuilder = StringBuffer("""
+      SELECT O.*, C.*, OPI.*
+      FROM orders O
+      INNER JOIN clients C ON O.clientId = C.clientId
+      INNER JOIN orderProductItems OPI ON OPI.orderId = O.id
+    """);
+
+        final whereConditions = <String>[];
+        print(
+            'startDate:====================================$startDate==========formated date=${formatDate(startDate!)}============================end date $endDate');
+
+        if (clientId != null && clientId != 0) {
+          whereConditions.add("O.clientId = $clientId");
+        }
+        if (startDate != null) {
+          whereConditions
+              .add("DATE(O.orderDate) >= '${formatDate(startDate)}'");
+        }
+        if (endDate != null) {
+          whereConditions
+              .add("DATE(O.orderDate) <= '${endDate.toIso8601String()}'");
+        }
+        if (minTotalPrice != null) {
+          whereConditions.add("O.totalPrice >= $minTotalPrice");
+        }
+        if (maxTotalPrice != null) {
+          whereConditions.add("O.totalPrice <= $maxTotalPrice");
+        }
+
+        if (whereConditions.isNotEmpty) {
+          queryBuilder.write(" WHERE ");
+          queryBuilder.write(whereConditions.join(" AND "));
+        }
+        queryBuilder.write(" GROUP BY O.id");
+
+        final result = await sqlHelper.db!.rawQuery(queryBuilder.toString());
+        print("Filtered orders: $result");
+
+        if (result.isNotEmpty) {
+          filteredOrders = result.map((item) => Order.fromJson(item)).toList();
+        } else {
+          filteredOrders = [];
+        }
+      } catch (e) {
+        filteredOrders = [];
+        print('Error in get filteredOrders: $e');
+      }
+    }
+
+    void setSelectedDateRange(DateTimeRange dateRange) {
+      selectedDateRange = dateRange;
+      //  filterSales();
+    }
+
+    void clearSelectedDateRange() {
+      selectedDateRange = null;
+    }
   }
 }

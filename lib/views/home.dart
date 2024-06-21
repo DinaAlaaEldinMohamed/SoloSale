@@ -18,6 +18,8 @@ class _HomePageState extends State<HomePage> {
   double exchangeRate = 0.0;
   String exchangeRateText = '';
   String selectedCurrencyCode = 'USD';
+  double todayTotalSales = 0;
+  //Map<String, double> todaySalesMap = {};
   //SalesController _salesController = Get.find();
   @override
   void initState() {
@@ -28,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   void init() async {
     var sqlIns = GetIt.I.get<SqlHelper>();
     selectedCurrencyCode = await sqlIns.getOrderPaidCurrency();
+    todayTotalSales =
+        await sqlIns.getTodayTotalSales(paidCurrency: selectedCurrencyCode);
     print(
         'selectedCurrencyCode order================================================================================================ $selectedCurrencyCode');
     tablesCreated = await sqlIns.createTables();
@@ -96,7 +100,8 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 16),
                   InfoHeader(
                     title: 'Today\'s Sales',
-                    trailing: '233 USD = 10996.40 EGP',
+                    trailing:
+                        '$todayTotalSales $selectedCurrencyCode = ${todayTotalSales * exchangeRate}EGP',
                     onTap: () {},
                   ),
                   const SizedBox(height: 20),

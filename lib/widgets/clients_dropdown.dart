@@ -65,6 +65,13 @@ class _ClientsDropDownState extends State<ClientsDropDown> {
                               style: bodyText(mediumGrayColor),
                             ),
                             items: [
+                              const DropdownMenuItem<int>(
+                                value: 0, // No value
+                                child: Icon(
+                                  Icons.refresh,
+                                  color: iconGrayColor,
+                                ),
+                              ),
                               for (var client in _clientController.clients!)
                                 DropdownMenuItem(
                                   value: client.clientId,
