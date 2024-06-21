@@ -17,7 +17,8 @@ const Color blackColor = Colors.black;
 const Color mediumGrayColor = Color.fromARGB(255, 161, 160, 160);
 const textGrayColor = Color(0xFFAAAAAA);
 const Color gray200Color = Color(0xFFEEEEEE);
-
+const Color redColor = Colors.red;
+const Color buttonBorderColor = Color(0xFFE0E0E0);
 const Color textDarkColor = Color(0xFF2B2B2B);
 
 TextStyle bodyText(Color? color) {

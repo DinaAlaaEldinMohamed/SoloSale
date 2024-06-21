@@ -122,11 +122,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Product Name'.tr,
+                      'Product Name',
                       style: bodyText(lightGrayColor),
                     ),
                     Text(
-                      'In Stock'.tr,
+                      'In Stock',
                       style: bodyText(warningColor),
                     ),
                   ],

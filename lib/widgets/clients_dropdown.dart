@@ -6,9 +6,14 @@ import 'package:get/get.dart';
 class ClientsDropDown extends StatefulWidget {
   final void Function(int?)? onChanged;
   final int? selectedValue;
-
+  final IconData? icon;
+  final String hintText;
   const ClientsDropDown(
-      {required this.onChanged, this.selectedValue, super.key});
+      {required this.onChanged,
+      this.selectedValue,
+      this.icon = Icons.arrow_forward_ios,
+      this.hintText = 'Select Client',
+      super.key});
 
   @override
   State<ClientsDropDown> createState() => _ClientsDropDownState();
@@ -40,7 +45,7 @@ class _ClientsDropDownState extends State<ClientsDropDown> {
                       height: 50,
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: borderColor,
+                          color: buttonBorderColor,
                         ),
                         borderRadius: BorderRadius.circular(5),
                       ),
@@ -52,12 +57,12 @@ class _ClientsDropDownState extends State<ClientsDropDown> {
                         child: DropdownButton(
                             value: widget.selectedValue,
                             isExpanded: true,
-                            icon: const Icon(Icons.arrow_forward_ios),
+                            icon: Icon(widget.icon),
                             iconSize: 15,
                             underline: const SizedBox(),
                             hint: Text(
-                              'Select Client',
-                              style: bodyText(textPlaceholderColor),
+                              widget.hintText,
+                              style: bodyText(mediumGrayColor),
                             ),
                             items: [
                               for (var client in _clientController.clients!)
@@ -71,6 +76,7 @@ class _ClientsDropDownState extends State<ClientsDropDown> {
                     ),
                   ),
                 ],
-              ); //DropdownButton(items: clients, onChanged:onChanged);
+              );
+    //DropdownButton(items: clients, onChanged:onChanged);
   }
 }
