@@ -88,74 +88,50 @@ class SalesController extends GetxController {
     DateTime? startDate,
     DateTime? endDate,
     int? clientId,
-    String? salesType,
+    String? salesCurrencyType,
   }) async {
-    double? minTotalPrice;
-    double? maxTotalPrice;
-    if (salesType != null) {
-      if (salesType == 'high') {
-        maxTotalPrice = 100000;
-      } else if (salesType == 'low') {
-        minTotalPrice = 10;
-      }
-
-      try {
-        final queryBuilder = StringBuffer("""
+    try {
+      final queryBuilder = StringBuffer("""
       SELECT O.*, C.*, OPI.*
       FROM orders O
       INNER JOIN clients C ON O.clientId = C.clientId
       INNER JOIN orderProductItems OPI ON OPI.orderId = O.id
     """);
 
-        final whereConditions = <String>[];
-        print(
-            'startDate:====================================$startDate==========formated date=${formatDate(startDate!)}============================end date $endDate');
+      final whereConditions = <String>[];
 
-        if (clientId != null && clientId != 0) {
-          whereConditions.add("O.clientId = $clientId");
-        }
-        if (startDate != null) {
-          whereConditions
-              .add("DATE(O.orderDate) >= '${formatDate(startDate)}'");
-        }
-        if (endDate != null) {
-          whereConditions
-              .add("DATE(O.orderDate) <= '${endDate.toIso8601String()}'");
-        }
-        if (minTotalPrice != null) {
-          whereConditions.add("O.totalPrice >= $minTotalPrice");
-        }
-        if (maxTotalPrice != null) {
-          whereConditions.add("O.totalPrice <= $maxTotalPrice");
-        }
-
-        if (whereConditions.isNotEmpty) {
-          queryBuilder.write(" WHERE ");
-          queryBuilder.write(whereConditions.join(" AND "));
-        }
-        queryBuilder.write(" GROUP BY O.id");
-
-        final result = await sqlHelper.db!.rawQuery(queryBuilder.toString());
-        print("Filtered orders: $result");
-
-        if (result.isNotEmpty) {
-          filteredOrders = result.map((item) => Order.fromJson(item)).toList();
-        } else {
-          filteredOrders = [];
-        }
-      } catch (e) {
-        filteredOrders = [];
-        print('Error in get filteredOrders: $e');
+      if (clientId != null && clientId != 0) {
+        whereConditions.add("O.clientId = $clientId");
       }
-    }
+      if (startDate != null) {
+        whereConditions.add("DATE(O.orderDate) >= '${formatDate(startDate)}'");
+      }
+      if (endDate != null) {
+        whereConditions.add("DATE(O.orderDate) <= '${formatDate(endDate)}'");
+      }
+      if (salesCurrencyType != null) {
+        if (salesCurrencyType != 'all') {
+          whereConditions.add("O.paidCurrency = '$salesCurrencyType'");
+        }
+      }
 
-    void setSelectedDateRange(DateTimeRange dateRange) {
-      selectedDateRange = dateRange;
-      //  filterSales();
-    }
+      if (whereConditions.isNotEmpty) {
+        queryBuilder.write(" WHERE ");
+        queryBuilder.write(whereConditions.join(" AND "));
+      }
+      queryBuilder.write(" GROUP BY O.id");
 
-    void clearSelectedDateRange() {
-      selectedDateRange = null;
+      final result = await sqlHelper.db!.rawQuery(queryBuilder.toString());
+      print("Filtered orders: $result");
+
+      if (result.isNotEmpty) {
+        filteredOrders = result.map((item) => Order.fromJson(item)).toList();
+      } else {
+        filteredOrders = [];
+      }
+    } catch (e) {
+      filteredOrders = [];
+      print('Error in get filteredOrders: $e');
     }
   }
 }

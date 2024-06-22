@@ -22,13 +22,13 @@ class _CurrencyDropDownState extends State<CurrencyDropDown> {
 
   @override
   void initState() {
-    GetIt.I.get<SqlHelper>().getCurrencies(setState);
+    sqlIns.getCurrencies(setState);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetIt.I.get<SqlHelper>().currencies == null
+    return sqlIns.currencies == null
         ? const Center(
             child: CircularProgressIndicator(),
           )
@@ -44,7 +44,7 @@ class _CurrencyDropDownState extends State<CurrencyDropDown> {
                   isExpanded: true,
                   underline: const SizedBox(),
                   items: [
-                    for (var currency in GetIt.I.get<SqlHelper>().currencies!)
+                    for (var currency in sqlIns.currencies!)
                       DropdownMenuItem(
                         value: currency.code,
                         child: Text(currency.code ?? 'No code'),
@@ -52,10 +52,9 @@ class _CurrencyDropDownState extends State<CurrencyDropDown> {
                   ],
                   onChanged: widget.onChanged,
                   dropdownColor: primaryColor,
-                  style: h6(whiteColor), // Set the text color
+                  style: h6(whiteColor),
                   icon: const Icon(Icons.arrow_drop_down, color: whiteColor),
                 ),
               );
-    //DropdownButton(items: clients, onChanged:onChanged);
   }
 }

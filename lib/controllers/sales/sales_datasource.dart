@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/order.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/const.dart';
+import 'package:flutter_pos/views/sales/sales_crud_screen.dart';
 import 'package:flutter_pos/widgets/products_widgets/product_details_bottom_sheet.dart';
 import 'package:flutter_pos/widgets/sales/sales_card.dart';
 
@@ -23,6 +24,13 @@ class SalesDataSource extends DataTableSource {
             ),
           ), onTap: () async {
         // await onViewProduct(orders![index], context);
+
+        await Navigator.push(
+            context!,
+            MaterialPageRoute(
+                builder: (ctx) => SalesCrudScreen(
+                      order: orders?[index],
+                    )));
       }),
       DataCell(
           GestureDetector(

@@ -4,6 +4,7 @@ import 'package:flutter_pos/controllers/sales/sales_datasource.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/widgets/app_table.dart';
 import 'package:flutter_pos/widgets/clients_dropdown.dart';
+import 'package:flutter_pos/widgets/currency_dropDown.dart';
 import 'package:flutter_pos/widgets/sales/sales_date_filter.dart';
 import 'package:flutter_pos/widgets/sales/sales_type_dropdown.dart';
 import 'package:get/get.dart';
@@ -21,7 +22,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
   final SalesController _salesController = Get.put(SalesController());
 
   int? selectedClientId;
-  String? selectedSalesFliterType = "all";
+  String? selectedSalesFliterType;
   @override
   void initState() {
     _salesController.getOrders(setState);
@@ -93,12 +94,11 @@ class _SalesListScreenState extends State<SalesListScreen> {
               ),
               Expanded(
                   child: SalesTypeDropDown(
-                hintText: 'All Sales',
                 selectedValue: selectedSalesFliterType,
                 onChanged: (value) async {
                   selectedSalesFliterType = value;
                   await _salesController.filterSales(setState,
-                      salesType: selectedSalesFliterType);
+                      salesCurrencyType: selectedSalesFliterType);
                   filterActive = true;
                   setState(() {});
                 },

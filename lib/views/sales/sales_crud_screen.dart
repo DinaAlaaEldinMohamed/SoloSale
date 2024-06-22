@@ -46,12 +46,21 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
     formattedDate = currentDateTime.toIso8601String();
     discountController =
         TextEditingController(text: '${widget.order?.discount ?? ''}');
+    if (widget.order != null) {
+      discountPercent();
+    }
     commentController =
         TextEditingController(text: widget.order?.orderComment ?? '');
     discountController?.addListener(_updateDiscountDisplay);
     selectedClientId = widget.order?.clientId;
-    selectedCurrencyCode = widget.currency?.code;
-
+    selectedCurrencyCode = widget.order?.paidCurrency;
+    if (widget.order == null) {
+      showDiscountField = false;
+    } else if (widget.order != null &&
+        (widget.order?.discount != 0 || widget.order?.discount != null)) {
+      discountAmount = widget.order?.discount ?? 0.0;
+      showDiscountField = true;
+    }
     orderLabel = widget.order == null
         ? '#OR${DateTime.now().millisecondsSinceEpoch}'
         : widget.order?.label;
@@ -276,8 +285,6 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                 CustomTextField(
                   fieldborderColor: mediumGrayColor,
                   labelText: 'Add Comment',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   controller: commentController,
                   placeHolderTextColor: mediumGrayColor,
                 ),
@@ -367,5 +374,15 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         ),
       );
     }
+  }
+
+  void discountPercent() {
+    double? discount;
+
+    var orderDiscountAmount = widget.order?.discount ?? 0.0;
+    var totalprice = widget.order?.totalPrice ?? 0.0;
+    discount = (orderDiscountAmount * 100) / totalprice;
+
+    discountController?.text = '$discount';
   }
 }

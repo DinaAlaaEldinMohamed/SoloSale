@@ -196,6 +196,7 @@ class _ProductCrudScreenState extends State<ProductCrudScreen> {
                                   width: 10,
                                 ),
                                 Switch(
+                                    inactiveTrackColor: primaryLightColor,
                                     value: isAvailable ?? false,
                                     onChanged: (value) {
                                       setState(() {
