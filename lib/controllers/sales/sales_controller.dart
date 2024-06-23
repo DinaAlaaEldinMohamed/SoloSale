@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/order.dart';
 import 'package:flutter_pos/models/order_item.dart';
+import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ class SalesController extends GetxController {
   List<Order>? orders;
   List<Order>? clientOrders;
   List<Order>? filteredOrders;
+  List<OrderItem>? orderItems;
 
   DateTimeRange? selectedDateRange;
 
@@ -51,6 +53,33 @@ class SalesController extends GetxController {
       }
     } catch (e) {
       orders = [];
+      print('Error in get Orders $e');
+    }
+
+    setStateCallBack(() {});
+  }
+
+  //=========================get  orderitems ================
+  Future<void> getOrderItems(int orderId, Function setStateCallBack) async {
+    try {
+      var result = await sqlHelper.db!.rawQuery("""
+  SELECT OPI.*, P.* FROM orderProductItems OPI
+      INNER JOIN products P ON OPI.productId = P.productId
+      WHERE OPI.orderId = '$orderId'
+  """);
+      print("(all order items)==============================>>>>>>>>$result");
+      if (result.isNotEmpty) {
+        orderItems = [];
+        for (var item in result) {
+          var orderItem = OrderItem.fromJson(item);
+          orderItem.product = Product.fromJson(item);
+          orderItems?.add(orderItem);
+        }
+      } else {
+        orderItems = [];
+      }
+    } catch (e) {
+      orderItems = [];
       print('Error in get Orders $e');
     }
 

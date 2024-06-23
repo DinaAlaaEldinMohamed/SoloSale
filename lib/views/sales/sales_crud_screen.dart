@@ -41,16 +41,32 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
   double discountAmount = 0.0;
   double exchangeRate = 0.0;
   String exchangeRateText = '';
+  double? orderTotalPrice;
   @override
   void initState() {
+    commentController =
+        TextEditingController(text: widget.order?.orderComment ?? '');
+    initPage();
+    super.initState();
+  }
+
+  void initPage() async {
     formattedDate = currentDateTime.toIso8601String();
     discountController =
         TextEditingController(text: '${widget.order?.discount ?? ''}');
     if (widget.order != null) {
       discountPercent();
+      await _salesController.getOrderItems(widget.order?.id ?? 0, setState);
+      selectedOrderItems = _salesController.orderItems;
+
+      print(
+          'selected orderitem=================================================${selectedOrderItems?.length}');
+      for (var orderItem in selectedOrderItems ?? []) {
+        print('orderItem=================:$orderItem');
+      }
+
+      totalPriceAfterDiscount = widget.order?.totalPrice ?? 0;
     }
-    commentController =
-        TextEditingController(text: widget.order?.orderComment ?? '');
     discountController?.addListener(_updateDiscountDisplay);
     selectedClientId = widget.order?.clientId;
     selectedCurrencyCode = widget.order?.paidCurrency;
@@ -60,31 +76,12 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         (widget.order?.discount != 0 || widget.order?.discount != null)) {
       discountAmount = widget.order?.discount ?? 0.0;
       showDiscountField = true;
+      orderTotalPrice = widget.order?.totalPrice ?? 0 + discountAmount;
     }
     orderLabel = widget.order == null
         ? '#OR${DateTime.now().millisecondsSinceEpoch}'
         : widget.order?.label;
     _displayExChangeRate();
-    super.initState();
-  }
-
-  void _updateDiscountDisplay() {
-    double discount = double.tryParse(discountController!.text) ?? 0.0;
-    discountAmount = calculateTotalPrice! * (discount / 100);
-    discountAmount = double.parse(discountAmount.toStringAsFixed(2));
-    totalPriceAfterDiscount = calculateTotalPrice! - discountAmount;
-
-    setState(() {});
-  }
-
-  void _displayExChangeRate() async {
-    exchangeRate = await GetIt.I
-        .get<SqlHelper>()
-        .exchangeRate(targetCurrency: selectedCurrencyCode ?? 'EGP');
-
-    exchangeRateText = '1 ${selectedCurrencyCode ?? 'EGP'} = $exchangeRate EGP';
-
-    setState(() {});
   }
 
   @override
@@ -131,7 +128,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                     top: 5,
                   ),
                   child: Text(
-                    '${exchangeRateText ?? ''}',
+                    exchangeRateText,
                     style: bodyText(warningColor),
                   ),
                 ),
@@ -187,7 +184,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                       style: bodyText(blackColor),
                     ),
                     Text(
-                      '$calculateTotalPrice ${selectedCurrencyCode ?? 'EGP'} ',
+                      '${widget.order == null ? calculateTotalPrice : orderTotalPrice ?? 0} ${selectedCurrencyCode ?? 'EGP'} ',
                       style: h6(blackColor),
                     ),
                   ],
@@ -232,7 +229,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                                 style: bodyText(blackColor),
                               ),
                               Text(
-                                '${discountAmount ?? '0'} $selectedCurrencyCode',
+                                '${discountAmount ?? 0} $selectedCurrencyCode',
                                 style: h6(blackColor),
                               ),
                             ],
@@ -300,7 +297,6 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                     } else {
                       print('oderItems${selectedOrderItems?.length}');
                     }
-
                     await onSetOrder();
                   },
                 ),
@@ -342,7 +338,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
       //add sale
       final order = Order.fromJson({
         'label': orderLabel,
-        'totalPrice': calculateTotalPrice,
+        'totalPrice': totalPriceAfterDiscount,
         'discount': discountAmount,
         'clientId': selectedClientId,
         'paidCurrency': selectedCurrencyCode ?? 'EGP',
@@ -384,5 +380,76 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
     discount = (orderDiscountAmount * 100) / totalprice;
 
     discountController?.text = '$discount';
+  }
+
+  void _updateDiscountDisplay() {
+    double discount = double.tryParse(discountController!.text) ?? 0.0;
+    discountAmount = calculateTotalPrice! * (discount / 100);
+    discountAmount = double.parse(discountAmount.toStringAsFixed(2));
+    totalPriceAfterDiscount = calculateTotalPrice! - discountAmount;
+
+    setState(() {});
+  }
+
+  void _displayExChangeRate() async {
+    exchangeRate = await GetIt.I
+        .get<SqlHelper>()
+        .exchangeRate(targetCurrency: selectedCurrencyCode ?? 'EGP');
+
+    exchangeRateText = '1 ${selectedCurrencyCode ?? 'EGP'} = $exchangeRate EGP';
+
+    setState(() {});
+  }
+
+  Widget orderItemColumn(
+      {String? selectedCurrency = 'EGP', double exchangeRate = 1}) {
+    return Column(children: [
+      const Text('Order Items',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16.0,
+          )),
+      for (var orderItem in selectedOrderItems ?? [])
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: ListTile(
+            contentPadding: EdgeInsets.zero, // Removes horizontal padding
+            dense: true, // Reduces the size of the ListTile
+            visualDensity: const VisualDensity(
+                horizontal: 0, vertical: -4), // Minimizes vertical padding
+            leading: Image.network(
+              orderItem.product.image ?? '',
+              errorBuilder: (BuildContext context, Object exception,
+                  StackTrace? stackTrace) {
+                return Image.asset('assets/images/product.png');
+              },
+            ),
+            title: Text(
+              '${orderItem.product.productName ?? 'No name'}',
+              style: bodyText(Colors.black),
+            ),
+            subtitle: Text(
+              '${(orderItem.productCount * orderItem.product.price).toStringAsFixed(2)} EGP\n${(orderItem.productCount * orderItem.product.price / exchangeRate).toStringAsFixed(2)} $selectedCurrency',
+              style: bodyText(lightGrayColor),
+            ),
+            trailing: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 8,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: const Color(0xFFE0E0E0),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  '${orderItem.productCount}x',
+                  style: h6(primaryColor),
+                )),
+          ),
+        ),
+    ]);
   }
 }
