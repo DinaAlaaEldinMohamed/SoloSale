@@ -21,7 +21,7 @@ class ProductCrudScreen extends StatefulWidget {
 }
 
 class _ProductCrudScreenState extends State<ProductCrudScreen> {
-  final ProductController _productController = Get.find();
+  final ProductController _productController = Get.put(ProductController());
 
   bool isUploading = false;
   File? imageFile;

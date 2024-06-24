@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_pos/models/currency.dart';
 import 'package:flutter_pos/models/exchange_rate.dart';
 import 'package:flutter_pos/utils/app_utils.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class SqlHelper {
-  var path = 'pos_db6.db';
+  var dbFile = 'pos_db6.db';
   List<Currency>? currencies;
   Database? db;
   Future<void>? registerForeignKeys() async {
@@ -94,12 +98,12 @@ class SqlHelper {
     try {
       if (kIsWeb) {
         var factory = databaseFactoryFfiWeb;
-        db = await factory.openDatabase(path);
+        db = await factory.openDatabase(dbFile);
         print(
             '=================== Database Created Successfully on web=====================');
       } else {
         db = await openDatabase(
-          path,
+          dbFile,
           version: 1,
           onCreate: (db, version) {
             print(
@@ -113,10 +117,103 @@ class SqlHelper {
     }
   }
 
+//==========================Database Backup=========================
+  Future<void> backupDB() async {
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+
+    String dbPath = await getDatabasesPath();
+    try {
+      Directory? backupDir = await getExternalStorageDirectory();
+      if (backupDir != null) {
+        Directory backupPath =
+            Directory('${backupDir.path}/SoloSaleDataBaseBackup');
+        await backupPath.create(recursive: true);
+
+        File ourDBFile = File('$dbPath/$dbFile');
+        await ourDBFile.copy('${backupPath.path}/$dbFile');
+        print('Database backup successful.');
+      } else {
+        print('Error: External storage directory is null.');
+      }
+    } catch (e) {
+      print('Error during database backup: $e');
+    }
+  }
+
+//=======================================Database Restore=================
+  Future<void> restoreDB() async {
+    String dbPath = await getDatabasesPath();
+
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+
+    var status1 = await Permission.storage.status;
+    if (!status1.isGranted) {
+      await Permission.storage.request();
+    }
+
+    try {
+      Directory? backupDir = await getExternalStorageDirectory();
+      if (backupDir != null) {
+        Directory backupPath =
+            Directory('${backupDir.path}/SoloSaleDataBaseBackup');
+        if (await backupPath.exists()) {
+          File savedDBFile = File('${backupPath.path}/$dbFile');
+          if (await savedDBFile.exists()) {
+            await savedDBFile.copy('$dbPath/$dbFile');
+            print('Database restore successful.');
+          } else {
+            print('Error: Backup file does not exist.');
+          }
+        } else {
+          print('Error: Backup folder does not exist.');
+        }
+      } else {
+        print('Error: External storage directory is null.');
+      }
+    } catch (e) {
+      print('Error during database restore: $e');
+    }
+  }
+
+  deleteDB() async {
+    try {
+      String dbPath = await getDatabasesPath();
+
+      db = null;
+      deleteDatabase('$dbPath/$dbFile');
+    } catch (e) {
+      print("======================there is error on database delete :$e");
+    }
+  }
+
+  getDbPath() async {
+    String dbPath = await getDatabasesPath();
+    print('====================database path:$dbPath');
+    Directory? externalStoragePath = await getExternalStorageDirectory();
+    print('====================externalStoragePath:$externalStoragePath');
+  }
+
+//=================DataBase Seed====================================
   Future<void> seedDatabase() async {
     try {
-      // Insert currencies
+      // Check if data already exists
+      final currenciesExist =
+          await db!.rawQuery("SELECT COUNT(*) FROM currencies");
+      final exchangeRatesExist =
+          await db!.rawQuery("SELECT COUNT(*) FROM exchangeRates");
 
+      if (currenciesExist.isNotEmpty && exchangeRatesExist.isNotEmpty) {
+        print('Data already exists. Skipping seed.');
+        return; // Data already inserted, no need to proceed further
+      }
+
+      // Insert currencies
       final usd = Currency.fromJson(
           {'code': "USD", 'name': "US Dollar", 'symbol': "\$"});
       final egp = Currency.fromJson(
@@ -138,10 +235,11 @@ class SqlHelper {
 
       print('Seed inserted successfully!');
     } catch (e) {
-      print('Error on seed currency and exchange rate : $e');
+      print('Error on seed currency and exchange rate: $e');
     }
   }
 
+//========================get currencies==========================
   void getCurrencies(Function setStateCallBack) async {
     try {
       //clients = [];

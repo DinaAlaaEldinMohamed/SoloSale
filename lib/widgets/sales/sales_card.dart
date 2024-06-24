@@ -3,6 +3,7 @@ import 'package:flutter_pos/models/order.dart';
 
 import 'package:flutter_pos/utils/const.dart';
 
+// ignore: must_be_immutable
 class SaleCard extends StatelessWidget {
   Order? order;
   SaleCard({this.order, super.key});

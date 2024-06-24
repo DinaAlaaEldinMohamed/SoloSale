@@ -42,6 +42,8 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
   double exchangeRate = 0.0;
   String exchangeRateText = '';
   double? orderTotalPrice;
+  String msg = '';
+
   @override
   void initState() {
     commentController =
@@ -58,13 +60,6 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
       discountPercent();
       await _salesController.getOrderItems(widget.order?.id ?? 0, setState);
       selectedOrderItems = _salesController.orderItems;
-
-      print(
-          'selected orderitem=================================================${selectedOrderItems?.length}');
-      for (var orderItem in selectedOrderItems ?? []) {
-        print('orderItem=================:$orderItem');
-      }
-
       totalPriceAfterDiscount = widget.order?.totalPrice ?? 0;
     }
     discountController?.addListener(_updateDiscountDisplay);
@@ -76,7 +71,6 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         (widget.order?.discount != 0 || widget.order?.discount != null)) {
       discountAmount = widget.order?.discount ?? 0.0;
       showDiscountField = true;
-      orderTotalPrice = widget.order?.totalPrice ?? 0 + discountAmount;
     }
     orderLabel = widget.order == null
         ? '#OR${DateTime.now().millisecondsSinceEpoch}'
@@ -184,7 +178,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                       style: bodyText(blackColor),
                     ),
                     Text(
-                      '${widget.order == null ? calculateTotalPrice : orderTotalPrice ?? 0} ${selectedCurrencyCode ?? 'EGP'} ',
+                      '${(calculateTotalPrice! / exchangeRate).toStringAsFixed(2)}${selectedCurrencyCode ?? '$calculateTotalPrice  EGP'} ',
                       style: h6(blackColor),
                     ),
                   ],
@@ -229,7 +223,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
                                 style: bodyText(blackColor),
                               ),
                               Text(
-                                '${discountAmount ?? 0} $selectedCurrencyCode',
+                                '${(discountAmount / exchangeRate).toStringAsFixed(2)} ${selectedCurrencyCode ?? '$discountAmount EGP'} ',
                                 style: h6(blackColor),
                               ),
                             ],
@@ -336,6 +330,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         return;
       }
       //add sale
+
       final order = Order.fromJson({
         'label': orderLabel,
         'totalPrice': totalPriceAfterDiscount,
@@ -346,15 +341,21 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         'orderDate': formattedDate
       });
       if (widget.order == null) {
-        // add product logic
+        // add Order logic
         await _salesController.addOrder(order, selectedOrderItems);
+        msg = 'Order Created Successfully';
+      } else {
+        //update Order Logic
+        await _salesController.updateOrder(
+            widget.order?.id, order, selectedOrderItems);
+        msg = 'Order Updated Successfully';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.green,
           content: Text(
-            'Order Created Successfully',
-            style: TextStyle(color: Colors.white),
+            msg,
+            style: const TextStyle(color: whiteColor),
           ),
         ),
       );
@@ -365,7 +366,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
           backgroundColor: Colors.red,
           content: Text(
             'Error : $e',
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: whiteColor),
           ),
         ),
       );
@@ -377,9 +378,9 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
 
     var orderDiscountAmount = widget.order?.discount ?? 0.0;
     var totalprice = widget.order?.totalPrice ?? 0.0;
-    discount = (orderDiscountAmount * 100) / totalprice;
-
-    discountController?.text = '$discount';
+    discount = (orderDiscountAmount * 100) / (totalprice + orderDiscountAmount);
+    String formattedDiscount = discount.toStringAsFixed(1);
+    discountController?.text = formattedDiscount;
   }
 
   void _updateDiscountDisplay() {
@@ -451,5 +452,20 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
           ),
         ),
     ]);
+  }
+
+  double? get calculateTotalPrice {
+    var totalPrice = 0.0;
+    if (orderItemsChanged) {
+      for (var orderItem in selectedOrderItems ?? []) {
+        totalPrice = totalPrice +
+            (orderItem?.productCount ?? 0) * (orderItem?.product?.price ?? 0);
+      }
+      return totalPrice;
+    } else {
+      totalPrice = widget.order?.totalPrice ?? 0 + discountAmount;
+
+      return totalPrice;
+    }
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SalesController extends GetxController {
   List<Order>? orders;
@@ -30,6 +31,73 @@ class SalesController extends GetxController {
     var result = await batch.commit();
 
     print('>>>>>>>> orderProductItems${result}');
+  }
+
+//=====================update Order =========================================
+  Future<void> updateOrder(
+      int? orderId, Order order, List<OrderItem>? selectedOrderItems) async {
+    try {
+      // Update order details
+      print('order id====================$orderId');
+      print('Order details: ${order.toJsonUpdateOrder()}');
+      print('Selected order items: $selectedOrderItems');
+
+      await sqlHelper.db!.update(
+        'orders',
+        order.toJsonUpdateOrder(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: 'id =?',
+        whereArgs: [orderId],
+      );
+
+      var batch = sqlHelper.db!.batch();
+      var existingOrderItems = await sqlHelper.db!.query(
+        'orderProductItems',
+        where: 'orderId =?',
+        whereArgs: [orderId],
+      );
+      var existingOrderItemsMap = {
+        for (var item in existingOrderItems) item['productId']: item
+      };
+
+      for (var orderItem in selectedOrderItems!) {
+        if (existingOrderItemsMap.containsKey(orderItem.productId)) {
+          // Update existing order item
+          batch.update(
+            'orderProductItems',
+            {
+              'productCount': orderItem.productCount,
+            },
+            where: 'orderId = ? AND productId = ?',
+            whereArgs: [orderId, orderItem.productId],
+          );
+        } else {
+          // Insert new order item
+          batch.insert('orderProductItems', {
+            'orderId': orderId,
+            'productId': orderItem.productId,
+            'productCount': orderItem.productCount,
+          });
+        }
+      }
+      // delete order items not in the updated selected orderItems
+      var productsIds =
+          selectedOrderItems.map((item) => item.productId).toSet();
+      for (var existingItem in existingOrderItems) {
+        if (!productsIds.contains(existingItem['productId'])) {
+          batch.delete(
+            'orderProductItems',
+            where: 'orderId = ? AND productId = ?',
+            whereArgs: [orderId, existingItem['productId']],
+          );
+        }
+      }
+
+      var result = await batch.commit();
+      print('Order items updated: $result');
+    } catch (e) {
+      print("Error on updating order: $e");
+    }
   }
 
 //=========================get all orders ================

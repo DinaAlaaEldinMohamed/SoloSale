@@ -11,7 +11,11 @@ class ClientController extends GetxController {
   void getClients(Function setStateCallBack) async {
     try {
       //clients = [];
-      var data = await sqlHelper.db!.query('clients');
+      var data = await sqlHelper.db!.rawQuery("""
+  Select C.*, count(O.id) as clientOrdersCount from clients  C
+    Inner JOIN orders O
+  On O.clientId = C.clientId
+               """);
 
       if (data.isNotEmpty) {
         clients = [];

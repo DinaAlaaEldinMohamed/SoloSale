@@ -85,13 +85,6 @@ class _ClientListScreenState extends State<ClientListScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    //Barcode Icon
-                    SearchFilterIcon(
-                      icon: Icons.qr_code_scanner,
-                      onPressed: () {
-                        //widget.scanner(context);
-                      },
-                    ),
                     const SizedBox(width: 8),
                     //Sort Icon
                     SearchFilterIcon(
@@ -122,17 +115,17 @@ class _ClientListScreenState extends State<ClientListScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Client'.tr,
+                      'Client',
                       style: bodyText(lightGrayColor),
                     ),
                     Text(
-                      'Sale Count'.tr,
+                      'Sales Count',
                       style: bodyText(warningColor),
                     ),
                   ],
                 ),
               ),
-              Divider(),
+              const Divider(),
             ]),
             //=================Clients Table============
             //header of table not displayed the header row is 0
@@ -143,7 +136,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
                   DataColumn(label: Text('Client')),
                   DataColumn(
                     label: Text(
-                      'Sale Count',
+                      'Sales Count',
                     ),
                   ),
                 ],

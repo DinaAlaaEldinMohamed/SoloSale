@@ -4,6 +4,7 @@ class Client {
   String? clientEmail;
   String? clientPhone;
   String? clientAddress;
+  int? clientOrdersCount;
 
   Client();
 
@@ -13,6 +14,7 @@ class Client {
     clientEmail = json['clientEmail'];
     clientPhone = json['clientPhone'];
     clientAddress = json['clientAddress'];
+    clientOrdersCount = json['clientOrdersCount'];
   }
 
   Map<String, dynamic> toJson() {

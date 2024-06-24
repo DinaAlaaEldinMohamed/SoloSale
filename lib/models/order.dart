@@ -50,4 +50,16 @@ class Order {
       'orderDate': orderDate,
     };
   }
+
+  Map<String, dynamic> toJsonUpdateOrder() {
+    return {
+      'label': label,
+      'totalPrice': totalPrice,
+      'discount': discount,
+      'clientId': clientId,
+      'paidCurrency': paidCurrency,
+      'orderComment': orderComment,
+      'orderDate': orderDate,
+    };
+  }
 }

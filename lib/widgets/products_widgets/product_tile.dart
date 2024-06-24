@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/product.dart';
 import 'package:flutter_pos/utils/const.dart';
 
+// ignore: must_be_immutable
 class ProductTile extends StatelessWidget {
   Product? product;
   ProductTile({this.product, super.key});

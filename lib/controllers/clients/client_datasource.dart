@@ -36,8 +36,7 @@ class ClientsDataSource extends DataTableSource {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '3',
-                      //  '${clients?[index].stock}',
+                      '${clients?[index].clientOrdersCount}',
                       style: h5(
                         warningColor,
                       ),

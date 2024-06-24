@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
+import 'package:flutter_pos/widgets/app_drawer.dart';
 import 'package:flutter_pos/widgets/grid_view.dart';
 import 'package:flutter_pos/widgets/info_header.dart';
 import 'package:get_it/get_it.dart';
@@ -32,9 +33,9 @@ class _HomePageState extends State<HomePage> {
     selectedCurrencyCode = await sqlIns.getOrderPaidCurrency();
     todayTotalSales =
         await sqlIns.getTodayTotalSales(paidCurrency: selectedCurrencyCode);
-    print(
-        'selectedCurrencyCode order================================================================================================ $selectedCurrencyCode');
+
     tablesCreated = await sqlIns.createTables();
+    sqlIns.getDbPath();
     await sqlIns.seedDatabase();
     exchangeRate =
         await sqlIns.exchangeRate(targetCurrency: selectedCurrencyCode);
@@ -49,7 +50,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.7,
-        child: const Drawer(),
+        child: const AppDrawer(),
       ),
       appBar: AppBar(
         backgroundColor: primaryColor,

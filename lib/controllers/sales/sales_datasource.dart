@@ -32,36 +32,36 @@ class SalesDataSource extends DataTableSource {
                       order: orders?[index],
                     )));
       }),
-      DataCell(
-          GestureDetector(
-            child: IntrinsicWidth(
-              child: Container(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context!).size.width * 0.25,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${orders?[index].totalPrice}',
-                      style: h5(
-                        warningColor,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.unfold_more,
-                      color: iconGrayColor,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          onTap: () {}),
+      // DataCell(
+      //     GestureDetector(
+      //       child: IntrinsicWidth(
+      //         child: Container(
+      //           padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+      //           constraints: BoxConstraints(
+      //             minWidth: MediaQuery.of(context!).size.width * 0.25,
+      //           ),
+      //           child: Row(
+      //             mainAxisAlignment: MainAxisAlignment.end,
+      //             crossAxisAlignment: CrossAxisAlignment.start,
+      //             children: [
+      //               Text(
+      //                 '${orders?[index].totalPrice}',
+      //                 style: h5(
+      //                   warningColor,
+      //                 ),
+      //               ),
+      //               const SizedBox(width: 8),
+      //               const Icon(
+      //                 Icons.unfold_more,
+      //                 color: iconGrayColor,
+      //                 size: 18,
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //     onTap: () {}),
     ]);
   }
 

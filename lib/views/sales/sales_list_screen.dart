@@ -4,7 +4,6 @@ import 'package:flutter_pos/controllers/sales/sales_datasource.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/widgets/app_table.dart';
 import 'package:flutter_pos/widgets/clients_dropdown.dart';
-import 'package:flutter_pos/widgets/currency_dropDown.dart';
 import 'package:flutter_pos/widgets/sales/sales_date_filter.dart';
 import 'package:flutter_pos/widgets/sales/sales_type_dropdown.dart';
 import 'package:get/get.dart';
@@ -26,7 +25,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
   @override
   void initState() {
     _salesController.getOrders(setState);
-    // TODO: implement initState
+
     super.initState();
   }
 
@@ -40,7 +39,8 @@ class _SalesListScreenState extends State<SalesListScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
-              var result = await Navigator.pushNamed(context, '/sales/add');
+              //  var result =
+              await Navigator.pushNamed(context, '/sales/add');
               // if (result == true) {
               //   _productController.getProducts(setState);
               // }
@@ -111,28 +111,29 @@ class _SalesListScreenState extends State<SalesListScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Order Label ',
-                  style: bodyText(lightGrayColor),
+                Container(
+                  child: Text('Order Label', style: bodyText(lightGrayColor)),
+                  color: Colors.amber,
                 ),
-                Text(
-                  'Total Price',
-                  style: bodyText(warningColor),
-                ),
+                // Text(
+                //   'Total Price',
+                //   style: bodyText(warningColor),
+                // ),
               ],
             ),
           ),
           const Divider(),
           Expanded(
             child: AppTable(
-              minWidth: 500,
+              // minWidth: 500,
+
               columns: const [
                 DataColumn(label: Text('Order Label')),
-                DataColumn(
-                  label: Text(
-                    'Total Price',
-                  ),
-                ),
+                // DataColumn(
+                //   label: Text(
+                //     'Total Price',
+                //   ),
+                // ),
               ],
               source: SalesDataSource(
                 context: context,

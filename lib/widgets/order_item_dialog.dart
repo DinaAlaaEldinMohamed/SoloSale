@@ -8,6 +8,7 @@ import 'package:flutter_pos/widgets/search_filter_icon.dart';
 import 'package:get/get.dart';
 
 List<OrderItem>? selectedOrderItems;
+bool orderItemsChanged = false;
 
 class OrderItemsDialog extends StatefulWidget {
   const OrderItemsDialog({super.key});
@@ -170,6 +171,7 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
                   label: 'Back',
                   onPressed: () {
                     Navigator.of(context).pop(true);
+                    orderItemsChanged = true;
                     setState(() {});
                   })
             ],
@@ -205,13 +207,4 @@ class _OrderItemsDialogState extends State<OrderItemsDialog> {
     selectedOrderItems!.add(orderItem);
     setState(() {});
   }
-}
-
-double? get calculateTotalPrice {
-  var totalPrice = 0.0;
-  for (var orderItem in selectedOrderItems ?? []) {
-    totalPrice = totalPrice +
-        (orderItem?.productCount ?? 0) * (orderItem?.product?.price ?? 0);
-  }
-  return totalPrice;
 }

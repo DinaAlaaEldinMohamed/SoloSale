@@ -22,7 +22,7 @@ class ProductDetailsBottomSheet extends StatefulWidget {
 }
 
 class _ProductDetailsBottomSheetState extends State<ProductDetailsBottomSheet> {
-  final ProductController _productController = Get.find();
+  final ProductController _productController = Get.put(ProductController());
   @override
   Widget build(BuildContext context) {
     return Wrap(
