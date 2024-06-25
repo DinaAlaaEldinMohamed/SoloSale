@@ -127,7 +127,7 @@ class _ClientCrudScreenState extends State<ClientCrudScreen> {
         else {
           await _clientController.updateClient(client, widget.client?.clientId);
 
-          // Navigator.pop(context, true);
+          //Navigator.pop(context, true);
         }
 
         ScaffoldMessenger.of(context).showSnackBar(

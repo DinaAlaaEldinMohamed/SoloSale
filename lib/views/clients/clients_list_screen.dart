@@ -35,7 +35,8 @@ class _ClientListScreenState extends State<ClientListScreen> {
               var result = await Navigator.pushNamed(context, '/clients/add');
 
               if (result == true) {
-                _clientController.getClients(setState);
+                await _clientController.getClients(setState);
+                setState(() {});
               }
             },
           ),

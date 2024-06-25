@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos/models/client.dart';
 import 'package:flutter_pos/utils/const.dart';
 
+// ignore: must_be_immutable
 class ClientTile extends StatelessWidget {
   Client? client;
   ClientTile({this.client, super.key});

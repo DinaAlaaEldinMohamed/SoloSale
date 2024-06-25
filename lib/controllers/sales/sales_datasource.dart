@@ -20,13 +20,10 @@ class SalesDataSource extends DataTableSource {
         cells: [
           DataCell(
               GestureDetector(
-                child: TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.top,
-                  child: SingleChildScrollView(
-                    child: SaleCard(
-                      order: orders?[index],
-                      // orderItems: orderItems,
-                    ),
+                child: SingleChildScrollView(
+                  child: SaleCard(
+                    order: orders?[index],
+                    // orderItems: orderItems,
                   ),
                 ),
               ), onTap: () async {

@@ -11,8 +11,8 @@ class ClientController extends GetxController {
   Future<void> getClients(Function setStateCallBack) async {
     try {
       final data = await sqlHelper.db!.query('clients');
+      clients = [];
       if (data.isNotEmpty) {
-        clients = [];
         for (var item in data) {
           final client = Client.fromJson(item);
           final clientId = client.clientId;

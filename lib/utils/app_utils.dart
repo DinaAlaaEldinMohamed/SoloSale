@@ -18,6 +18,19 @@ String formatStringDate(String? inputDate) {
   }
 }
 
+String formatTime(String dateStr) {
+  try {
+    DateTime parsedDateTime = DateTime.parse(dateStr);
+    String formattedHour = parsedDateTime.hour.toString().padLeft(2, '0');
+    String formattedMinute = parsedDateTime.minute.toString().padLeft(2, '0');
+    String formattedTime = "$formattedHour:$formattedMinute ";
+    formattedTime += parsedDateTime.hour < 12 ? "am" : "pm";
+    return formattedTime;
+  } catch (e) {
+    return "Invalid date format. Please provide a valid ISO date string.";
+  }
+}
+
 String formatNumber(double value, {int decimalPlaces = 2}) {
   return value.toStringAsFixed(decimalPlaces);
 }

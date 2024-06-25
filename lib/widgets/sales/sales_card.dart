@@ -89,7 +89,7 @@ class _SaleCardState extends State<SaleCard> {
                   Row(
                     children: [
                       Text(
-                        '${'Reciept'}: 12:00 pm',
+                        '${'Reciept'}: ${formatTime(widget.order?.orderDate ?? '')}',
                         style: h6(
                           Theme.of(context).textTheme.bodyLarge!.color,
                         ),
