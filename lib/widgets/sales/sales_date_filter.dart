@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pos/controllers/sales/sales_controller.dart';
 import 'package:flutter_pos/utils/const.dart';
-import 'package:get/get.dart';
 
+// ignore: must_be_immutable
 class SalesDateFilter extends StatefulWidget {
   void Function()? onTap;
   SalesDateFilter({this.onTap, super.key});
@@ -12,8 +11,6 @@ class SalesDateFilter extends StatefulWidget {
 }
 
 class _SalesDateFilterState extends State<SalesDateFilter> {
-  final SalesController _salesController = Get.put(SalesController());
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

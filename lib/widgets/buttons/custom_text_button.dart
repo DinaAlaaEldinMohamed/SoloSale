@@ -24,7 +24,7 @@ class CustomTextButton extends StatelessWidget {
             onPressed: onPressed,
             child: Text(
               buttonLabel,
-              style: bodyText(lightGrayColor),
+              style: bodyText(lightGreyColor),
             ),
           ),
         ));

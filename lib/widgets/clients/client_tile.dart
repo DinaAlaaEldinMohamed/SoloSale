@@ -33,7 +33,7 @@ class ClientTile extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     '${client?.clientPhone}',
-                    style: bodyText(lightGrayColor),
+                    style: bodyText(lightGreyColor),
                   ),
                 ],
               ),

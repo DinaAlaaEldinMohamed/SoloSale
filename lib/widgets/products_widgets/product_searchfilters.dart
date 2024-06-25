@@ -89,7 +89,7 @@ class _SearchFiltersState extends State<SearchFilters> {
           children: [
             Text(
               'Product Name'.tr,
-              style: bodyText(lightGrayColor),
+              style: bodyText(lightGreyColor),
             ),
             Text(
               'In Stock'.tr,

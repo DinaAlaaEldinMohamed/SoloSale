@@ -89,21 +89,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
                     //Sort Icon
                     SearchFilterIcon(
                       icon: Icons.sort,
-                      onPressed: () {
-                        // showModalBottomSheet(
-                        //   isScrollControlled: true,
-                        //   context: context,
-                        //   shape: const RoundedRectangleBorder(
-                        //     borderRadius: BorderRadius.only(
-                        //       topLeft: Radius.circular(4),
-                        //       topRight: Radius.circular(4),
-                        //     ),
-                        //   ),
-                        //   builder: (_) {
-                        //     return const SortProductsBottomSheet();
-                        //   },
-                        //);
-                      },
+                      onPressed: () {},
                     ),
                   ]),
                 ),
@@ -116,7 +102,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
                   children: [
                     Text(
                       'Client',
-                      style: bodyText(lightGrayColor),
+                      style: bodyText(lightGreyColor),
                     ),
                     Text(
                       'Sales Count',

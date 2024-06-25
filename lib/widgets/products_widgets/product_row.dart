@@ -24,7 +24,7 @@ class CustomRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: bodyText(lightGrayColor),
+              style: bodyText(lightGreyColor),
             ),
             const SizedBox(width: 10),
             Flexible(

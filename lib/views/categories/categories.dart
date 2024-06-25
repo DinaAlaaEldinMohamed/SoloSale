@@ -52,17 +52,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
           ),
           child: GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(4),
-                    topRight: Radius.circular(4),
-                  ),
-                ),
-                builder: (_) => ProductDetailsBottomSheet(),
-              );
+              // showModalBottomSheet(
+              //   context: context,
+              //   isScrollControlled: true,
+              //   shape: const RoundedRectangleBorder(
+              //     borderRadius: BorderRadius.only(
+              //       topLeft: Radius.circular(4),
+              //       topRight: Radius.circular(4),
+              //     ),
+              //   ),
+              //   builder: (_) => ProductDetailsBottomSheet(),
+              // );
             },
             child: PaginatedDataTable2(
                 onPageChanged: (index) {
@@ -148,7 +148,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         var sqlHelper = GetIt.I.get<SqlHelper>();
         await sqlHelper.db!
             .delete('categories', where: 'id =?', whereArgs: [category.id]);
-        _categoryController.categories;
+        _categoryController.getCategories(setState);
       }
     } catch (e) {
       // ignore: use_build_context_synchronously

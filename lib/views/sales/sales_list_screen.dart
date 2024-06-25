@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/controllers/sales/sales_controller.dart';
 import 'package:flutter_pos/controllers/sales/sales_datasource.dart';
-import 'package:flutter_pos/utils/const.dart';
+import 'package:flutter_pos/models/order_item.dart';
+import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:flutter_pos/widgets/app_table.dart';
 import 'package:flutter_pos/widgets/clients_dropdown.dart';
 import 'package:flutter_pos/widgets/sales/sales_date_filter.dart';
 import 'package:flutter_pos/widgets/sales/sales_type_dropdown.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 
 bool filterActive = false;
+List<OrderItem>? orderItems;
 
 class SalesListScreen extends StatefulWidget {
   const SalesListScreen({super.key});
@@ -22,6 +25,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
 
   int? selectedClientId;
   String? selectedSalesFliterType;
+
   @override
   void initState() {
     _salesController.getOrders(setState);
@@ -48,10 +52,10 @@ class _SalesListScreenState extends State<SalesListScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(children: [
-          Row(
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
@@ -87,6 +91,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
                   if (picked != null) {
                     await _salesController.filterSales(setState,
                         startDate: picked.start, endDate: picked.end);
+
                     filterActive = true;
                   }
                   setState(() {});
@@ -106,45 +111,48 @@ class _SalesListScreenState extends State<SalesListScreen> {
               ))
             ],
           ),
-          Container(
-            padding: const EdgeInsets.only(top: 10, bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  child: Text('Order Label', style: bodyText(lightGrayColor)),
-                  color: Colors.amber,
-                ),
-                // Text(
-                //   'Total Price',
-                //   style: bodyText(warningColor),
-                // ),
-              ],
-            ),
-          ),
-          const Divider(),
-          Expanded(
-            child: AppTable(
-              // minWidth: 500,
-
-              columns: const [
-                DataColumn(label: Text('Order Label')),
-                // DataColumn(
-                //   label: Text(
-                //     'Total Price',
-                //   ),
-                // ),
-              ],
-              source: SalesDataSource(
-                context: context,
-                orders: filterActive == true
-                    ? _salesController.filteredOrders
-                    : _salesController.orders,
+        ),
+        Container(
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                //  child: Text('Order Label', style: bodyText(lightGrayColor)),
+                color: Colors.amber,
               ),
+              // Text(
+              //   'Total Price',
+              //   style: bodyText(warningColor),
+              // ),
+            ],
+          ),
+        ),
+        const Divider(),
+        Expanded(
+          child: AppTable(
+            wrapInCard: true,
+            minWidth: MediaQuery.of(context).size.width,
+            dataRowHeight: 400,
+            columns: const [
+              DataColumn(
+                label: Text('Order Label'),
+              ),
+              // DataColumn(
+              //   label: Text(
+              //     'Total Price',
+              //   ),
+              // ),
+            ],
+            source: SalesDataSource(
+              context: context,
+              orders: filterActive == true
+                  ? _salesController.filteredOrders
+                  : _salesController.orders,
             ),
           ),
-        ]),
-      ),
+        ),
+      ]),
     );
   }
 }

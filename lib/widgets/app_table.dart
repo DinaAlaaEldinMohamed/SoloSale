@@ -2,14 +2,23 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pos/utils/const.dart';
 
+// ignore: must_be_immutable
 class AppTable extends StatelessWidget {
   final List<DataColumn> columns;
   final DataTableSource source;
   final double minWidth;
-  const AppTable(
+  final double dataRowHeight;
+  bool wrapInCard;
+
+  TableBorder? border = TableBorder.symmetric(
+      inside: const BorderSide(color: veryLightGrayColor));
+  AppTable(
       {required this.columns,
       required this.source,
       this.minWidth = 600,
+      this.dataRowHeight = 100,
+      this.border,
+      this.wrapInCard = false,
       super.key});
 
   @override
@@ -33,16 +42,15 @@ class AppTable extends StatelessWidget {
         rowsPerPage: 15,
         horizontalMargin: 10,
         checkboxHorizontalMargin: 12,
-        dataRowHeight: 100,
+        dataRowHeight: dataRowHeight,
         // dataTextStyle: bodyText(lightGrayColor),
         columnSpacing: 10,
-        wrapInCard: false,
+        wrapInCard: wrapInCard,
         renderEmptyRowsInTheEnd: false,
-        headingTextStyle: const TextStyle(color: lightGrayColor, fontSize: 18),
+        headingTextStyle: const TextStyle(color: lightGreyColor, fontSize: 18),
         headingRowColor: const MaterialStatePropertyAll(whiteColor),
         headingRowHeight: 0,
-        border: TableBorder.symmetric(
-            inside: BorderSide(color: veryLightGrayColor)),
+        border: border,
         // headingRowDecoration:
         //     BoxDecoration(backgroundBlendMode: BlendMode.dstIn),
         columns: columns,

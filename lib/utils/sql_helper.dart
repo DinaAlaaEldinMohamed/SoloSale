@@ -208,32 +208,34 @@ class SqlHelper {
       final exchangeRatesExist =
           await db!.rawQuery("SELECT COUNT(*) FROM exchangeRates");
 
-      if (currenciesExist.isNotEmpty && exchangeRatesExist.isNotEmpty) {
+      if (currenciesExist.isEmpty ||
+          currenciesExist.first.values.first == 0 ||
+          exchangeRatesExist.isEmpty ||
+          exchangeRatesExist.first.values.first == 0) {
+        // Insert currencies
+        final usd = Currency.fromJson(
+            {'code': "USD", 'name': "US Dollar", 'symbol': "\$"});
+        final egp = Currency.fromJson(
+            {'code': 'EGP', 'name': 'Egyptian Pound', 'symbol': '£'});
+        final eur =
+            Currency.fromJson({'code': 'EUR', 'name': 'Euro', 'symbol': '€'});
+
+        await db!.insert('currencies', usd.toJson());
+        await db!.insert('currencies', egp.toJson());
+        await db!.insert('currencies', eur.toJson());
+
+        // Insert exchange rates
+        final usdToEgp = ExchangeRate(
+            baseCurrency: 'EGP', targetCurrency: 'USD', rate: 47.65);
+        final eurToEgp = ExchangeRate(
+            baseCurrency: 'EGP', targetCurrency: 'EUR', rate: 51.42);
+        await db!.insert('exchangeRates', usdToEgp.toJson());
+        await db!.insert('exchangeRates', eurToEgp.toJson());
+
+        print('Seed inserted successfully!');
+      } else {
         print('Data already exists. Skipping seed.');
-        return; // Data already inserted, no need to proceed further
       }
-
-      // Insert currencies
-      final usd = Currency.fromJson(
-          {'code': "USD", 'name': "US Dollar", 'symbol': "\$"});
-      final egp = Currency.fromJson(
-          {'code': 'EGP', 'name': 'Egyptian Pound', 'symbol': '£'});
-      final eur =
-          Currency.fromJson({'code': 'EUR', 'name': 'Euro', 'symbol': '€'});
-
-      await db!.insert('currencies', usd.toJson());
-      await db!.insert('currencies', egp.toJson());
-      await db!.insert('currencies', eur.toJson());
-
-      // Insert exchange rates
-      final usdToEgp =
-          ExchangeRate(baseCurrency: 'EGP', targetCurrency: 'USD', rate: 47.65);
-      final eurToEgp =
-          ExchangeRate(baseCurrency: 'EGP', targetCurrency: 'EUR', rate: 51.42);
-      await db!.insert('exchangeRates', usdToEgp.toJson());
-      await db!.insert('exchangeRates', eurToEgp.toJson());
-
-      print('Seed inserted successfully!');
     } catch (e) {
       print('Error on seed currency and exchange rate: $e');
     }

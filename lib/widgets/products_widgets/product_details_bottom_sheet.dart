@@ -60,7 +60,7 @@ class _ProductDetailsBottomSheetState extends State<ProductDetailsBottomSheet> {
                         ),
                         Text(
                           'Category: ${widget.product?.categoryName ?? ''}',
-                          style: bodyText(lightGrayColor),
+                          style: bodyText(lightGreyColor),
                         ),
                         const Divider(),
                         //product code row

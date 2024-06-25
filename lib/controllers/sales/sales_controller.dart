@@ -104,17 +104,21 @@ class SalesController extends GetxController {
   Future<void> getOrders(Function setStateCallBack) async {
     try {
       var result = await sqlHelper.db!.rawQuery("""
-  Select O.*,C.*,OPI.* , DATE(O.orderDate) as formated_date from orders O
-  Inner JOIN clients C
-  On O.clientId = C.clientId
-   Inner JOIN orderProductItems OPI
-  On OPI.orderId = O.id
-  """);
+      SELECT O.*, C.*, OPI.*, P.*, DATE(O.orderDate) as formated_date
+      FROM orders O
+      INNER JOIN clients C ON O.clientId = C.clientId
+      INNER JOIN orderProductItems OPI ON OPI.orderId = O.id
+      INNER JOIN products P ON OPI.productId = P.productId
+    """);
       print("all orders==============================>>>>>>>>$result");
       if (result.isNotEmpty) {
         orders = [];
         for (var item in result) {
-          orders?.add(Order.fromJson(item));
+          final order = Order.fromJson(item);
+          // Fetch associated order items for this order
+          await getOrderItems(setStateCallBack, orderId: order.id);
+          order.orderItems = orderItems;
+          orders?.add(order);
         }
       } else {
         orders = [];
@@ -128,7 +132,7 @@ class SalesController extends GetxController {
   }
 
   //=========================get  orderitems ================
-  Future<void> getOrderItems(int orderId, Function setStateCallBack) async {
+  Future<void> getOrderItems(Function setStateCallBack, {int? orderId}) async {
     try {
       var result = await sqlHelper.db!.rawQuery("""
   SELECT OPI.*, P.* FROM orderProductItems OPI
@@ -189,11 +193,11 @@ class SalesController extends GetxController {
   }) async {
     try {
       final queryBuilder = StringBuffer("""
-      SELECT O.*, C.*, OPI.*
-      FROM orders O
-      INNER JOIN clients C ON O.clientId = C.clientId
-      INNER JOIN orderProductItems OPI ON OPI.orderId = O.id
-    """);
+        SELECT O.*, C.*, OPI.*
+        FROM orders O
+        INNER JOIN clients C ON O.clientId = C.clientId
+        INNER JOIN orderProductItems OPI ON OPI.orderId = O.id
+      """);
 
       final whereConditions = <String>[];
 
@@ -222,7 +226,13 @@ class SalesController extends GetxController {
       print("Filtered orders: $result");
 
       if (result.isNotEmpty) {
-        filteredOrders = result.map((item) => Order.fromJson(item)).toList();
+        filteredOrders = result.map((item) {
+          final order = Order.fromJson(item);
+          // Fetch associated order items for this order
+          getOrderItems(setStateCallBack, orderId: order.id);
+          order.orderItems = orderItems; // Assign the list of order items
+          return order;
+        }).toList();
       } else {
         filteredOrders = [];
       }

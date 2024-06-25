@@ -123,7 +123,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   children: [
                     Text(
                       'Product Name',
-                      style: bodyText(lightGrayColor),
+                      style: bodyText(lightGreyColor),
                     ),
                     Text(
                       'In Stock',

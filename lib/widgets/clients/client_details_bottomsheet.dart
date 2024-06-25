@@ -7,6 +7,7 @@ import 'package:flutter_pos/widgets/buttons/secondary_button.dart';
 import 'package:flutter_pos/widgets/products_widgets/product_row.dart';
 import 'package:get/get.dart';
 
+// ignore: must_be_immutable
 class ClientDetailsBottonSheet extends StatefulWidget {
   Client? client;
   ClientDetailsBottonSheet({this.client, super.key});
@@ -52,7 +53,7 @@ class _ClientDetailsBottonSheetState extends State<ClientDetailsBottonSheet> {
                         ),
                         Text(
                           'Phone: ${widget.client?.clientPhone ?? ''}',
-                          style: bodyText(lightGrayColor),
+                          style: bodyText(lightGreyColor),
                         ),
                         const Divider(),
                         //product code row

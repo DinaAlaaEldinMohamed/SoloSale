@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/utils/app_utils.dart';
 import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:flutter_pos/widgets/app_drawer.dart';
@@ -102,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                   InfoHeader(
                     title: 'Today\'s Sales',
                     trailing:
-                        '$todayTotalSales $selectedCurrencyCode = ${todayTotalSales * exchangeRate}EGP',
+                        '${formatNumber(todayTotalSales)} $selectedCurrencyCode = ${formatNumber(todayTotalSales * exchangeRate)}EGP',
                     onTap: () {},
                   ),
                   const SizedBox(height: 20),

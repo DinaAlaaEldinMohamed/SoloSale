@@ -8,29 +8,46 @@ class ClientController extends GetxController {
   List<Client>? clients;
   var sqlHelper = GetIt.I.get<SqlHelper>();
 
-  void getClients(Function setStateCallBack) async {
+  Future<void> getClients(Function setStateCallBack) async {
     try {
-      //clients = [];
-      var data = await sqlHelper.db!.rawQuery("""
-  Select C.*, count(O.id) as clientOrdersCount from clients  C
-    Inner JOIN orders O
-  On O.clientId = C.clientId
-               """);
-
+      final data = await sqlHelper.db!.query('clients');
       if (data.isNotEmpty) {
         clients = [];
         for (var item in data) {
-          clients?.add(Client.fromJson(item));
-          print(item);
+          final client = Client.fromJson(item);
+          final clientId = client.clientId;
+          final orderCount = await getClientOrderCount(clientId);
+          client.clientOrdersCount = orderCount;
+          clients?.add(client);
         }
       } else {
         clients = [];
       }
     } catch (e) {
       clients = [];
-      print('Error in get  $e');
+      print('Error in getClients: $e');
     }
     setStateCallBack(() {});
+  }
+
+  Future<int> getClientOrderCount(int? clientId) async {
+    try {
+      final result = await sqlHelper.db!.rawQuery("""
+      SELECT COUNT(O.id) AS clientOrdersCount
+      FROM orders O
+      WHERE O.clientId = $clientId
+    """);
+
+      if (result.isNotEmpty) {
+        final count = result.first['clientOrdersCount'] as int;
+        return count;
+      } else {
+        return 0; // No orders for this client
+      }
+    } catch (e) {
+      print('Error in getClientOrderCount: $e');
+      return 0;
+    }
   }
 
   void searchClients(String text) async {

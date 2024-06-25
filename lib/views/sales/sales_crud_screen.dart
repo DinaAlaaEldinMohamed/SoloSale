@@ -14,6 +14,7 @@ import 'package:flutter_pos/widgets/currency_dropDown.dart';
 import 'package:flutter_pos/widgets/custom_text_field.dart';
 import 'package:flutter_pos/widgets/dashed_line.dart';
 import 'package:flutter_pos/widgets/order_item_dialog.dart';
+import 'package:flutter_pos/widgets/sales/order_item_column.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 
@@ -58,7 +59,8 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         TextEditingController(text: '${widget.order?.discount ?? ''}');
     if (widget.order != null) {
       discountPercent();
-      await _salesController.getOrderItems(widget.order?.id ?? 0, setState);
+      await _salesController.getOrderItems(setState,
+          orderId: widget.order?.id ?? 0);
       selectedOrderItems = _salesController.orderItems;
       totalPriceAfterDiscount = widget.order?.totalPrice ?? 0;
     }
@@ -115,7 +117,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
             Expanded(
               child: Container(
                 height: 30,
-                color: const Color(0xFFFFF2CC),
+                color: yellowColor,
                 child: Padding(
                   padding: const EdgeInsets.only(
                     left: 20,
@@ -144,7 +146,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: gray100Color,
+              color: grey0Color,
               border: Border.all(
                 color: const Color(0xFFE0E0E0),
                 width: 1,
@@ -153,9 +155,11 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
             ),
             child: Column(
               children: [
-                orderItemColumn(
-                    selectedCurrency: selectedCurrencyCode,
-                    exchangeRate: exchangeRate),
+                OrderItemColumn(
+                  selectedCurrency: selectedCurrencyCode,
+                  exchangeRate: exchangeRate,
+                  orderItems: selectedOrderItems,
+                ),
                 CustomTextButton(
                   buttonLabel: 'Add Product',
                   onPressed: () {
@@ -333,7 +337,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
 
       final order = Order.fromJson({
         'label': orderLabel,
-        'totalPrice': totalPriceAfterDiscount,
+        'totalPrice': totalPriceAfterDiscount / exchangeRate,
         'discount': discountAmount,
         'clientId': selectedClientId,
         'paidCurrency': selectedCurrencyCode ?? 'EGP',
@@ -400,58 +404,6 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
     exchangeRateText = '1 ${selectedCurrencyCode ?? 'EGP'} = $exchangeRate EGP';
 
     setState(() {});
-  }
-
-  Widget orderItemColumn(
-      {String? selectedCurrency = 'EGP', double exchangeRate = 1}) {
-    return Column(children: [
-      const Text('Order Items',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 16.0,
-          )),
-      for (var orderItem in selectedOrderItems ?? [])
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: ListTile(
-            contentPadding: EdgeInsets.zero, // Removes horizontal padding
-            dense: true, // Reduces the size of the ListTile
-            visualDensity: const VisualDensity(
-                horizontal: 0, vertical: -4), // Minimizes vertical padding
-            leading: Image.network(
-              orderItem.product.image ?? '',
-              errorBuilder: (BuildContext context, Object exception,
-                  StackTrace? stackTrace) {
-                return Image.asset('assets/images/product.png');
-              },
-            ),
-            title: Text(
-              '${orderItem.product.productName ?? 'No name'}',
-              style: bodyText(Colors.black),
-            ),
-            subtitle: Text(
-              '${(orderItem.productCount * orderItem.product.price).toStringAsFixed(2)} EGP\n${(orderItem.productCount * orderItem.product.price / exchangeRate).toStringAsFixed(2)} $selectedCurrency',
-              style: bodyText(lightGrayColor),
-            ),
-            trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6,
-                  horizontal: 8,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: const Color(0xFFE0E0E0),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  '${orderItem.productCount}x',
-                  style: h6(primaryColor),
-                )),
-          ),
-        ),
-    ]);
   }
 
   double? get calculateTotalPrice {

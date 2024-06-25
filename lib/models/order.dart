@@ -1,3 +1,5 @@
+import 'package:flutter_pos/models/order_item.dart';
+
 class Order {
   int? id;
   String? label;
@@ -9,6 +11,9 @@ class Order {
   String? paidCurrency;
   String? orderComment;
   String? orderDate;
+  String? formated_date;
+  List<OrderItem>? orderItems;
+
   Order();
 
   Order.fromJson(Map<String, dynamic> json) {
@@ -22,6 +27,12 @@ class Order {
     paidCurrency = json['paidCurrency'];
     orderComment = json['orderComment'];
     orderDate = json['orderDate'];
+    formated_date = json['formated_date'];
+    if (json['orderItems'] != null) {
+      orderItems = List<OrderItem>.from(
+        json['orderItems'].map((item) => OrderItem.fromJson(item)),
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
