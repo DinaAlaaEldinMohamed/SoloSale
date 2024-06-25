@@ -193,7 +193,7 @@ class SalesController extends GetxController {
   }) async {
     try {
       final queryBuilder = StringBuffer("""
-        SELECT O.*, C.*, OPI.*
+        SELECT O.*, C.*, OPI.*,DATE(O.orderDate) as formated_date
         FROM orders O
         INNER JOIN clients C ON O.clientId = C.clientId
         INNER JOIN orderProductItems OPI ON OPI.orderId = O.id

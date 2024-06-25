@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pos/utils/const.dart';
 import 'package:flutter_pos/utils/sql_helper.dart';
 import 'package:get_it/get_it.dart';
 
@@ -54,26 +55,68 @@ class _AppDrawerState extends State<AppDrawer> {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.backup),
-            title: const Text('Backup Database'),
-            onTap: () {
-              sqlIns.backupDB();
-            },
-          ),
+              leading: const Icon(Icons.backup),
+              title: const Text('Backup Database'),
+              onTap: () async {
+                try {
+                  await sqlIns.backupDB();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Backup successful!'),
+                      backgroundColor: greenColor,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Backup failed.'),
+                        backgroundColor: redColor),
+                  );
+                }
+              }),
           ListTile(
-            leading: const Icon(Icons.delete),
-            title: const Text('Delete Database'),
-            onTap: () {
-              sqlIns.deleteDB();
-            },
-          ),
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete Database'),
+              onTap: () async {
+                try {
+                  await sqlIns.deleteDB();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Delete DB successful!'),
+                      backgroundColor: greenColor,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Delete DB failed.'),
+                      backgroundColor: redColor,
+                    ),
+                  );
+                }
+              }),
           ListTile(
-            leading: const Icon(Icons.restore),
-            title: const Text('Restore Database'),
-            onTap: () {
-              sqlIns.restoreDB();
-            },
-          ),
+              leading: const Icon(Icons.restore),
+              title: const Text('Restore Database'),
+              onTap: () async {
+                try {
+                  await sqlIns.restoreDB();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Restore DB successful!'),
+                      backgroundColor: greenColor,
+                    ),
+                  );
+                  setState(() {});
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Restore DB failed.'),
+                      backgroundColor: redColor,
+                    ),
+                  );
+                }
+              }),
         ],
       ),
     );
