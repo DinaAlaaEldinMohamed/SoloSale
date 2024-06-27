@@ -34,10 +34,10 @@ class _ClientListScreenState extends State<ClientListScreen> {
             onPressed: () async {
               var result = await Navigator.pushNamed(context, '/clients/add');
 
-              if (result == true) {
-                await _clientController.getClients(setState);
-                setState(() {});
-              }
+              // if (result == true) {
+              //   await _clientController.getClients(setState);
+              //   setState(() {});
+              // }
             },
           ),
         ],

@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
     selectedCurrencyCode = await sqlIns.getOrderPaidCurrency();
     todayTotalSales =
         await sqlIns.getTodayTotalSales(paidCurrency: selectedCurrencyCode);
+    setState(() {});
 
     tablesCreated = await sqlIns.createTables();
     sqlIns.getDbPath();

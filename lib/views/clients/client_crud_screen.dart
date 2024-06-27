@@ -141,7 +141,8 @@ class _ClientCrudScreenState extends State<ClientCrudScreen> {
             ),
           ),
         );
-        Navigator.popAndPushNamed(context, '/clients', result: true);
+        Navigator.popAndPushNamed(context, '/clients');
+        //  Navigator.popAndPushNamed(context, '/clients', result: true);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

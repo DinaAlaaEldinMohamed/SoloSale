@@ -63,6 +63,8 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
           orderId: widget.order?.id ?? 0);
       selectedOrderItems = _salesController.orderItems;
       totalPriceAfterDiscount = widget.order?.totalPrice ?? 0;
+    } else {
+      selectedOrderItems = [];
     }
     discountController?.addListener(_updateDiscountDisplay);
     selectedClientId = widget.order?.clientId;
@@ -342,7 +344,8 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
         'clientId': selectedClientId,
         'paidCurrency': selectedCurrencyCode ?? 'EGP',
         'orderComment': commentController?.text ?? 'no comment',
-        'orderDate': formattedDate
+        'orderDate':
+            widget.order == null ? formattedDate : widget.order?.orderDate
       });
       if (widget.order == null) {
         // add Order logic
@@ -363,7 +366,7 @@ class _SalesCrudScreenState extends State<SalesCrudScreen> {
           ),
         ),
       );
-      Navigator.pop(context, true);
+      Navigator.popAndPushNamed(context, '/');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
